@@ -12,7 +12,7 @@ var colors = [
 ];
 
 // Define the maximum number of vertices
-var maxNumVertices = 3600; // 3600 triangles
+var maxNumVertices = 3600 * 3; // 3600 triangles
 
 // Initialize the index variable
 var index = 0;
@@ -111,7 +111,11 @@ window.onload = function init() {
                 }
             }
 
-            gl.bufferSubData(gl.ARRAY_BUFFER, 12 * index, flatten(t));
+            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[0]));
+            index++;
+            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[1]));
+            index++;
+            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[2]));
 
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             t = vec4(colors[index % 7]);
