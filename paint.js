@@ -46,6 +46,8 @@ window.onload = function init() {
             // Calculate the relative position within the square unit
             var x_rel = event.clientX % squareSide;
             var y_rel = event.clientY % squareSide;
+            console.log(x_rel)
+            console.log(y_rel)
   
             // Determine the square based on relative position
             var squareType = "";
@@ -67,7 +69,8 @@ window.onload = function init() {
             var center = vec2(center_x, center_y);
             
             // Calculate the slope
-            slope = (y_rel-15) / (x_rel-15);
+            slope = (y_rel - (squareSide / 2)) / (x_rel - (squareSide / 2));
+            slopeSq = slope * slope;
 
             // Coordinates of the vertex points
             var t;
@@ -78,7 +81,7 @@ window.onload = function init() {
         
             // Determine which triangle the mouse is on based on slopes
             if (squareType === "leftTop") {
-                if (slope > -1) {
+                if (slopeSq < 1) {
                     // Mouse is on the left triangle
                     t = [leftTopC, leftBottomC, center];
                 } else {
@@ -86,7 +89,7 @@ window.onload = function init() {
                     t = [leftTopC, rightTopC, center];
                 }
             } else if (squareType === "leftBottom") {
-                if (slope < 1) {
+                if (slopeSq < 1) {
                     // Mouse is on the left triangle
                     t = [leftTopC, leftBottomC, center];
                 } else {
@@ -94,7 +97,7 @@ window.onload = function init() {
                     t = [leftBottomC, rightBottomC, center];
                 }
             } else if (squareType === "rightTop") {
-                if (slope < 1) {
+                if (slopeSq < 1) {
                     // Mouse is on the right triangle
                     t = [rightTopC, rightBottomC, center];
                 } else {
@@ -102,7 +105,7 @@ window.onload = function init() {
                     t = [leftTopC, rightTopC, center];
                 }
             } else if (squareType === "rightBottom") {
-                if (slope > -1) {
+                if (slopeSq < 1) {
                     // Mouse is on the right triangle
                     t = [rightTopC, rightBottomC, center];
                 } else {
