@@ -12,10 +12,11 @@ var colors = [
 ];
 
 // Define the maximum number of vertices
-var maxNumVertices = 3600 * 3; // 3600 triangles
+var maxNumVertices = 3600; // 3600 triangles
 
 // Initialize the index variable
 var index = 0;
+
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -32,94 +33,99 @@ window.onload = function init() {
 
     canvas.addEventListener("mousemove", function(event) {
         if (redraw) {
+          
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-            var wind_x = 2 * event.clientX / canvas.width - 1;
-            var wind_y = 2 * (canvas.height - event.clientY) / canvas.height - 1;
 
-            //index eklendi
-            //------------------------------------------------------------------------------------------------------------
-            var x_index = Math.floor(wind_x / (2 / 30));
-            var y_index = Math.floor(wind_y / (2 / 30));
+            // Calculating the side of the square as we want 30x30 square grid
+            squareSide = Math.floor(canvas.width / 30);
+
+            // Calculating the index of the square mouse is on
+            var x_index = Math.floor(event.clientX /  squareSide);
+            var y_index = Math.floor(event.clientY /  squareSide);
 
             // Calculate the relative position within the square unit
-            var x_rel = wind_x % (2 / 30);
-            var y_rel = wind_y % (2 / 30);
-
+            var x_rel = event.clientX % squareSide;
+            var y_rel = event.clientY % squareSide;
+  
             // Determine the square based on relative position
             var squareType = "";
 
-            if (x_rel < 1 / 30 && y_rel < 1 / 30) {
+            if (x_rel < squareSide/2 && y_rel < squareSide/2) {
                 squareType = "leftTop";
-            } else if (x_rel < 1 / 30 && y_rel >= 1 / 30) {
+            } else if (x_rel < squareSide/2 && y_rel >= squareSide/2) {
                 squareType = "leftBottom";
-            } else if (x_rel >= 1 / 30 && y_rel < 1 / 30) {
+            } else if (x_rel >=  squareSide/2 && y_rel < squareSide/2) {
                 squareType = "rightTop";
             } else {
                 squareType = "rightBottom";
             }
 
-            // Calculate slopes
-            //x_index y_index olarak degisti
-            //--------------------------------------------------------------------------------------------------------------
-            var center_x = ((x_index * (2 / 30)) + 1/30);
-            var center_y = ((y_index * (2 / 30)) + 1/30);
+            // Calculate center point
+            var center_x = x_index * (squareSide) + (squareSide / 2);
+            var center_y = y_index * (squareSide) + (squareSide / 2);
+            console.log(event.clientX + "is x location and " +  center_x + " is center x");
+            var center = vec2(center_x, center_y);
+            
+            // Calculate the slope
+            slope = (y_rel-15) / (x_rel-15);
 
-            var slope = (wind_y - center_y) / (wind_x - center_x);
-
-            //vertexler degisti
-            //---------------------------------------------------------------------------------------------------------------
-            var vertexCenter = vec2(center_x , center_y);
-            var vertexTopRight = vec2((x_index + 1) * 2 / 30, y_index * 2 / 30);
-            var vertexTopLeft = vec2(x_index * 2 / 30, y_index * 2 / 30);
-            var vertexBottomRight = vec2((x_index + 1) * 2 / 30, (y_index + 1) * 2 / 30);
-            var vertexBottomLeft = vec2(x_index * 2 / 30, (y_index + 1) * 2 / 30);
-
-            // Determine which triangle the mouse is on based on slopes
+            // Coordinates of the vertex points
             var t;
-
+            var leftTopC = vec2( x_index *squareSide, y_index*squareSide);
+            var rightTopC = vec2( ( x_index +1 ) * squareSide, y_index *squareSide);
+            var leftBottomC = vec2( x_index *squareSide, ( y_index +1 )*squareSide);
+            var rightBottomC = vec2( (x_index + 1 )*squareSide, ( y_index +1 )*squareSide);
+        
+            // Determine which triangle the mouse is on based on slopes
             if (squareType === "leftTop") {
                 if (slope > -1) {
                     // Mouse is on the left triangle
-                    t = [vertexTopLeft, vertexCenter, vertexBottomLeft];
+                    t = [leftTopC, leftBottomC, center];
                 } else {
                     // Mouse is on the top triangle
-                    t = [vertexTopLeft, vertexCenter, vertexTopRight];
+                    t = [leftTopC, rightTopC, center];
                 }
             } else if (squareType === "leftBottom") {
                 if (slope < 1) {
                     // Mouse is on the left triangle
-                    t = [vertexTopLeft, vertexCenter, vertexBottomLeft];
+                    t = [leftTopC, leftBottomC, center];
                 } else {
                     // Mouse is on the bottom triangle
-                    t = [vertexBottomLeft, vertexCenter, vertexBottomRight];
+                    t = [leftBottomC, rightBottomC, center];
                 }
             } else if (squareType === "rightTop") {
                 if (slope < 1) {
                     // Mouse is on the right triangle
-                    t = [vertexTopRight, vertexCenter, vertexBottomRight];
+                    t = [rightTopC, rightBottomC, center];
                 } else {
                     // Mouse is on the top triangle
-                    t = [vertexTopLeft, vertexCenter, vertexTopRight];
+                    t = [leftTopC, rightTopC, center];
                 }
             } else if (squareType === "rightBottom") {
                 if (slope > -1) {
                     // Mouse is on the right triangle
-                    t = [vertexTopRight, vertexCenter, vertexBottomRight];
+                    t = [rightTopC, rightBottomC, center];
                 } else {
                     // Mouse is on the bottom triangle
-                    t = [vertexBottomLeft, vertexCenter, vertexBottomRight];
+                    t = [leftBottomC, rightBottomC, center];
                 }
             }
 
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[0]));
-            index++;
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[1]));
-            index++;
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t[2]));
+            // Normalize between -1 and 1
+            function normalize(coord, width, height) {
+                return vec2(2 * coord[0] / width - 1, 2*(height - coord[1])/height -1);
+            }
+            t = t.map(coord => normalize(coord, canvas.width, canvas.height));
+            console.log(t[0]);
+            console.log(t[1]);
+            console.log(t[2]);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            t = vec4(colors[index % 7]);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
+            // Construct buffer subdata
+            gl.bufferSubData(gl.ARRAY_BUFFER, 24 * index, flatten(t));
+
+            //gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            //t = vec4(colors[index % 7]);
+            //gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
             index++;
         }
     });
@@ -133,12 +139,10 @@ window.onload = function init() {
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, 12 * maxNumVertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 24* maxNumVertices, gl.STATIC_DRAW);
 
-    //vPosition, 2 ////vPosition, 3///
-    //--------------------------------------------------------------------------------------------------------------------------------- 
     var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
     var cBuffer = gl.createBuffer();
@@ -154,8 +158,6 @@ window.onload = function init() {
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
-    //index*3 //// index ///
-    //--------------------------------------------------------------------------------------------------------------------------------
-    gl.drawArrays(gl.TRIANGLES, 0, index); // Multiply by 3 for the number of vertices
+    gl.drawArrays(gl.TRIANGLES, 0, index*3 );
     window.requestAnimationFrame(render);
 }
