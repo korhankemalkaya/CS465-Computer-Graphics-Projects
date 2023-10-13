@@ -27,7 +27,7 @@ varying vec4 fColor;
 void
 main()
 {
-    gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    gl_FragColor = fColor;
 }
 </script>
 
@@ -37,8 +37,21 @@ main()
 <script type="text/javascript" src="paint.js"></script>
 
 <body>
-<canvas id="gl-canvas" width="1200" height="1200">>
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+<div>
+    <canvas id="gl-canvas" width="450" height="450">
+    Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+</div>
+<div>
+    <select id = "colormenu" size = "7" onChange="changed(this.value)">
+        <option value = "0">Black</option>
+        <option value = "1">Red</option>
+        <option value = "2">Yellow</option>
+        <option value = "3">Green</option>
+        <option value = "4">Blue</option>
+        <option value = "5">Magenta</option>
+        <option value = "6">Cyan</option>
+    </select>
+</div>
 </body>
 </html>
