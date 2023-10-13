@@ -10,13 +10,18 @@ var colors = [
     vec4(1.0, 0.0, 1.0, 1.0),   // magenta
     vec4(0.0, 1.0, 1.0, 1.0)    // cyan
 ];
+var cindex = 0;
+
+// Get the chosen color
+function changed(value){
+    cindex = value;
+}
 
 // Define the maximum number of vertices
-var maxNumVertices = 3600; // 3600 triangles
+var maxNumVertices = 3600*3; // 3600 triangles
 
 // Initialize the index variable
 var index = 0;
-
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -46,8 +51,6 @@ window.onload = function init() {
             // Calculate the relative position within the square unit
             var x_rel = event.clientX % squareSide;
             var y_rel = event.clientY % squareSide;
-            console.log(x_rel)
-            console.log(y_rel)
   
             // Determine the square based on relative position
             var squareType = "";
@@ -65,7 +68,7 @@ window.onload = function init() {
             // Calculate center point
             var center_x = x_index * (squareSide) + (squareSide / 2);
             var center_y = y_index * (squareSide) + (squareSide / 2);
-            console.log(event.clientX + "is x location and " +  center_x + " is center x");
+            //console.log(event.clientX + "is x location and " +  center_x + " is center x");
             var center = vec2(center_x, center_y);
             
             // Calculate the slope
@@ -119,22 +122,22 @@ window.onload = function init() {
                 return vec2(2 * coord[0] / width - 1, 2*(height - coord[1])/height -1);
             }
             t = t.map(coord => normalize(coord, canvas.width, canvas.height));
-            console.log(t[0]);
-            console.log(t[1]);
-            console.log(t[2]);
 
             // Construct buffer subdata
+            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
             gl.bufferSubData(gl.ARRAY_BUFFER, 24 * index, flatten(t));
 
-            //gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            //t = vec4(colors[index % 7]);
-            //gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
+            // Load color
+            t = vec4(colors[cindex]);
+            gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+            gl.bufferSubData(gl.ARRAY_BUFFER, 48 * index, flatten(t));
             index++;
         }
     });
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Load shaders and initialize attribute buffers
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -142,7 +145,7 @@ window.onload = function init() {
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, 24* maxNumVertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 24 * maxNumVertices, gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -150,7 +153,7 @@ window.onload = function init() {
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, 16 * maxNumVertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 48 * maxNumVertices, gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
