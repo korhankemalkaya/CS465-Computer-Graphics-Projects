@@ -61,28 +61,36 @@ window.onload = function init() {
 
     canvas.addEventListener("mousedown", function(event) {
         redraw = true;
+        if (tool == "0") {
+            render();
+        }
     });
 
     canvas.addEventListener("mouseup", function(event) {
-        redraw = false;
-
-        strokes[strokeNumber] = []
-        strokeColors[strokeNumber] = []
-        for(var i = 0; i <strokeTriangleNumber; i++){
-            strokes[strokeNumber].push(triangles[strokeStartIndex + i]);
-            strokeColors[strokeNumber].push(colorsSaved[strokeStartIndex + i]);
+        if (tool == "0"){
+            redraw = false;
+            if (strokeTriangleNumber > 0 ) {
+                strokes[strokeNumber] = []
+                strokeColors[strokeNumber] = []
+                for(var i = 0; i < strokeTriangleNumber; i++){
+                    strokes[strokeNumber].push(triangles[strokeStartIndex + i]);
+                    strokeColors[strokeNumber].push(colorsSaved[strokeStartIndex + i]);
+                }
+        
+                console.log("stroke number " + strokes.length);
+                console.log("triangle length " + strokes[strokeNumber].length);
+        
+        
+                strokeStartIndex += strokeTriangleNumber;
+                strokeTriangleNumber = 0;
+                strokeNumber++;
+                redo = [];
+                redoColors = [];
+                redoPossible= false;
+            }
+           
         }
-
-        console.log("stroke number " + strokes.length);
-        console.log("triangle length " + strokes[strokeNumber].length);
-
-
-        strokeStartIndex += strokeTriangleNumber;
-        strokeTriangleNumber = 0;
-        strokeNumber++;
-        redo = [];
-        redoColors = [];
-        redoPossible= false;
+      
     });
 
     canvas.addEventListener("mousemove", function(event) {
@@ -187,28 +195,34 @@ window.onload = function init() {
                     }
                     iterateIndex++;
                 }
+                //Check if colors are different
+                if(found){
+                    if(colorsSaved[iterateIndex-1][0][0] != colors[cindex][0] || colorsSaved[iterateIndex-1][0][1] != colors[cindex][1] || colorsSaved[iterateIndex-1][0][2] != colors[cindex][2]){
+                        found = false;
+                    }
+                }
 
                 if(!found){
                     triangles.push(t);
-                    console.log(triangles.length)
                     strokeTriangleNumber += 1;
+                    index++;
                 }
                 
                 // Construct buffer subdata
                 gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-                gl.bufferSubData(gl.ARRAY_BUFFER, 24 * index, flatten(t));
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
     
                 // Load color
+                console.log(cindex);
                 t = [vec4(colors[cindex]) , vec4(colors[cindex]) , vec4(colors[cindex])];
 
                 if(!found){
                     colorsSaved.push(t);
                 }
-
+  
                 gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-                gl.bufferSubData(gl.ARRAY_BUFFER, 48 * index, flatten(t));
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
     
-                index++;
             }else if(tool == "1"){
                 var found = false;
                 var iterateIndex = 0;
@@ -313,10 +327,10 @@ function redoAction(){
         //---------------------------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------------------------
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0 , flatten(colorsSaved.flat()));
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
         gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0 , flatten(triangles.flat()));
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
         //---------------------------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------------------------
 
@@ -357,10 +371,10 @@ function undoAction(){
         //---------------------------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------------------------
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0 , flatten(colorsSaved.flat()));
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
         gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0 , flatten(triangles.flat()));
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
         //---------------------------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------------------------
 
