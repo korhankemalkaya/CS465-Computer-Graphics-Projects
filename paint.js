@@ -3,6 +3,11 @@ var gl;
 var vBuffer;
 var cBuffer;
 var redraw = false;
+var zoomMatrixLoc;
+var zoomMatrix = [1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1];
 var colors = [
     vec4(0.0, 0.0, 0.0, 1.0),   // black
     vec4(1.0, 0.0, 0.0, 1.0),   // red
@@ -59,6 +64,15 @@ window.onload = function init() {
         }
     });
 
+    canvas.addEventListener("wheel", event => {
+        const delta = Math.sign(event.deltaY);
+        if(delta < 0){
+            zoomOut();
+        }else if(delta > 0){
+            zoomIn();
+        }
+    });
+
     canvas.addEventListener("mousedown", function(event) {
         redraw = true;
         if (tool == "0") {
@@ -77,20 +91,14 @@ window.onload = function init() {
                     strokeColors[strokeNumber].push(colorsSaved[strokeStartIndex + i]);
                 }
         
-                console.log("stroke number " + strokes.length);
-                console.log("triangle length " + strokes[strokeNumber].length);
-        
-        
                 strokeStartIndex += strokeTriangleNumber;
                 strokeTriangleNumber = 0;
                 strokeNumber++;
                 redo = [];
                 redoColors = [];
                 redoPossible= false;
-            }
-           
+            }       
         }
-      
     });
 
     canvas.addEventListener("mousemove", function(event) {
@@ -127,7 +135,6 @@ window.onload = function init() {
             // Calculate center point
             var center_x = x_index * (squareSide) + (squareSide / 2);
             var center_y = y_index * (squareSide) + (squareSide / 2);
-            //console.log(event.clientX + "is x location and " +  center_x + " is center x");
             var center = vec2(center_x, center_y);
             
             // Calculate the slope
@@ -213,7 +220,6 @@ window.onload = function init() {
                 gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
     
                 // Load color
-                console.log(cindex);
                 t = [vec4(colors[cindex]) , vec4(colors[cindex]) , vec4(colors[cindex])];
 
                 if(!found){
@@ -240,29 +246,15 @@ window.onload = function init() {
                     iterateIndex++;
                 }
 
-                if(found){
-                    
-                    //console.log(flatten(t))
-                    //console.log(flatten(triangles.flat()));
-
+                if(found){                    
                     triangles.splice(delIndex,1);
                     colorsSaved.splice(delIndex,1);
-                    //console.log(delIndex)
-                    //console.log(triangles.length);
-                    //console.log(colorsSaved.length);
 
-                    
-                    //console.log(colorsSaved.length);
-
-                    //---------------------------------------------------------------------------------------------------------------------------
-                    //---------------------------------------------------------------------------------------------------------------------------
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
                     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
                     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
                     gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
-                    //---------------------------------------------------------------------------------------------------------------------------
-                    //---------------------------------------------------------------------------------------------------------------------------
 
                     index--;
                 }
@@ -294,12 +286,13 @@ window.onload = function init() {
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
 
+    zoomMatrixLoc = gl.getUniformLocation( program, "zoomMatrix" );
+
     render();
 }
 
 function redoAction(){
     if(redoPossible && redo.length > 0){
-        console.log("redo func -------------------------------------------")
         strokeStartIndex += redo[redo.length-1].length;
         strokeNumber++;
 
@@ -321,18 +314,11 @@ function redoAction(){
             colorsSaved.push(temp[i]);
         }
 
-        console.log(strokes.length)
-        console.log(triangles.length)
-
-        //---------------------------------------------------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------------------------------------------------
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
         gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
-        //---------------------------------------------------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------------------------------------------------
 
         if (redo.length == 0){
             redoPossible = false;
@@ -343,7 +329,6 @@ function redoAction(){
 
 function undoAction(){
     if(strokeNumber > 0){
-        console.log("undo func -------------------------------------------")
         strokeStartIndex -= strokes[strokeNumber-1].length;
         strokeNumber--;
 
@@ -367,27 +352,31 @@ function undoAction(){
 
         redoPossible = true;
 
-
-        //---------------------------------------------------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------------------------------------------------
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
         gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
-        //---------------------------------------------------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------------------------------------------------
 
-        console.log(strokes.length)
-        console.log(triangles.length)
         render();
     }
 }
 
+function zoomIn(){
+    zoomMatrix[15] = zoomMatrix[15] - 0.1;
+    render();
+}
+
+function zoomOut(){
+    zoomMatrix[15] = zoomMatrix[15] + 0.1;
+    render();
+}
+
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniformMatrix4fv( zoomMatrixLoc, false, flatten(zoomMatrix));
     gl.drawArrays(gl.TRIANGLES, 0, index * 3 );
     window.requestAnimationFrame(render);
 }
-
-//ciz sil tekrar ciz yapildiginda buffer overflow
+//redo undo sonrasi brush erase calismiyor
+//erase sonrasi undo redo
