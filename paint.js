@@ -230,7 +230,8 @@ window.onload = function init() {
                     for (var j = 0; j < copiedTriangles[i].length; j++) {
                         var temp = vec2(copiedTriangles[i][j][0], copiedTriangles[i][j][1]);
                         tempT.push(temp);
-                        tempC.push(copiedColors[i][j]);
+                        var tempc = vec4(copiedColors[i][j][0], copiedColors[i][j][1], copiedColors[i][j][2], copiedColors[i][j][3]);
+                        tempC.push(tempc);
                     }
                     //Same for colors
                     triangles.push(tempT);
@@ -317,36 +318,48 @@ window.onload = function init() {
             }       
         }//When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
         else if (tool == "2") {
-            //When any vertices of a triangle is outside the rectangular area, the triangle is not selected.
-            //When all vertices of a triangle is inside the rectangular area, the triangle is selected.
-            isSelected = true;
-            isDrawingSelectionRectangle = false;
-            selectionRectangle.endX = event.clientX - canvas.getBoundingClientRect().left;
-            selectionRectangle.endY = event.clientY - canvas.getBoundingClientRect().top;
-            selectionRectangle.endX = 2 * selectionRectangle.endX / canvas.width - 1;
-            selectionRectangle.endY =  2*(canvas.height - selectionRectangle.endY)/canvas.height -1;
-            for (var i = 0; i < triangles.length; i++) {  
-                var currTriangle = triangles[i];
-                var currColor = colorsSaved[i];
-                var put = true; // Assume triangle is selected initially
-                for (var j = 0; j < currTriangle.length; j++) {
-                    var currVertex = currTriangle[j];
-                    // Check if the vertex is OUTSIDE the rectangle
-                    if (currVertex[0] < Math.min(selectionRectangle.startX, selectionRectangle.endX) || 
-                        currVertex[0] > Math.max(selectionRectangle.startX, selectionRectangle.endX) || 
-                        currVertex[1] < Math.min(selectionRectangle.startY, selectionRectangle.endY) || 
-                        currVertex[1] > Math.max(selectionRectangle.startY, selectionRectangle.endY)) {
-                        put = false; // Mark triangle to not be selected as a vertex is outside
-                        break;// No need to check other vertices as we found one outside the rectangle
+                // When any vertices of a triangle is outside the rectangular area, the triangle is not selected.
+                // When all vertices of a triangle is inside the rectangular area, the triangle is selected.
+                isSelected = true;
+                isDrawingSelectionRectangle = false;
+                selectionRectangle.endX = event.clientX - canvas.getBoundingClientRect().left;
+                selectionRectangle.endY = event.clientY - canvas.getBoundingClientRect().top;
+                selectionRectangle.endX = 2 * selectionRectangle.endX / canvas.width - 1;
+                selectionRectangle.endY = 2 * (canvas.height - selectionRectangle.endY) / canvas.height - 1;
+            
+                var triangleMap = {};  // Mapping object to keep track of latest occurrence of each unique triangle
+            
+                for (var i = 0; i < triangles.length; i++) {
+                    var currTriangle = triangles[i];
+                    var currColor = colorsSaved[i];
+                    var triangleKey = currTriangle.flat().toString();  // Create a unique key for each triangle based on its vertices
+            
+                    var put = true;  // Assume triangle is selected initially
+            
+                    for (var j = 0; j < currTriangle.length; j++) {
+                        var currVertex = currTriangle[j];
+                        // Check if the vertex is OUTSIDE the rectangle
+                        if (currVertex[0] < Math.min(selectionRectangle.startX, selectionRectangle.endX) ||
+                            currVertex[0] > Math.max(selectionRectangle.startX, selectionRectangle.endX) ||
+                            currVertex[1] < Math.min(selectionRectangle.startY, selectionRectangle.endY) ||
+                            currVertex[1] > Math.max(selectionRectangle.startY, selectionRectangle.endY)) {
+                            put = false;  // Mark triangle to not be selected as a vertex is outside
+                            break;  // No need to check other vertices as we found one outside the rectangle
+                        }
+                    }
+            
+                    if (put) {
+                        triangleMap[triangleKey] = { color: currColor, triangle: currTriangle };  // Update mapping object with latest occurrence
                     }
                 }
-                if (put) {
-                    selectedTriangleColors.push(currColor);
-                    selectedTriangles.push(currTriangle);
+            
+                for (var key in triangleMap) {
+                    selectedTriangleColors.push(triangleMap[key].color);
+                    selectedTriangles.push(triangleMap[key].triangle);
                 }
-            }          
-        }
-        
+            
+            }
+            
     });
 
     canvas.addEventListener("mousemove", function(event) {
