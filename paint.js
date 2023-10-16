@@ -126,7 +126,7 @@ window.onload = function init() {
             const y = event.clientY - rect.top;
 
             // Calculating the side of the square as we want 30x30 square grid
-            squareSide = Math.floor(canvas.width / 30);
+            var squareSide = Math.floor(canvas.width / 30);
 
             // Calculating the index of the square mouse is on
             var x_index = Math.floor(x /  squareSide);
@@ -401,9 +401,20 @@ function zoomOut(canvasX , canvasY){
     render();
 }
 
+function resetZoom(){
+    zoomMatrix = [1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1];
+
+    render();
+}
+
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniformMatrix4fv( zoomMatrixLoc, false, flatten(zoomMatrix));
     gl.drawArrays(gl.TRIANGLES, 0, index * 3 );
     window.requestAnimationFrame(render);
 }
+
+//zoom out drawing
