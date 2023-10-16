@@ -50,6 +50,11 @@ var maxNumVertices = 3600*3; // 3600 triangles
 // Initialize the index variable
 var index = 0;
 
+var mouseX = 0;
+var mouseY = 0;
+var canvasX = -1;
+var canvasY = +1;
+
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
@@ -66,10 +71,22 @@ window.onload = function init() {
 
     canvas.addEventListener("wheel", event => {
         const delta = Math.sign(event.deltaY);
+        
+        const rect = canvas.getBoundingClientRect()
+        var newMouseX = event.clientX - rect.left;
+        var newMouseY = event.clientY - rect.top;
+
+        if(newMouseX != mouseX || newMouseY != mouseY){
+            mouseX = newMouseX;
+            mouseY = newMouseY;
+            canvasX = (2 * mouseX / canvas.width - 1);
+            canvasY = (2*(canvas.height - mouseY)/canvas.height -1);   
+        }
+
         if(delta < 0){
-            zoomOut();
+            zoomOut(canvasX , canvasY);
         }else if(delta > 0){
-            zoomIn();
+            zoomIn(canvasX , canvasY);
         }
     });
 
@@ -362,13 +379,25 @@ function undoAction(){
     }
 }
 
-function zoomIn(){
-    zoomMatrix[15] = zoomMatrix[15] - 0.1;
+function zoomIn(canvasX , canvasY){
+    zoomMatrix[15] = zoomMatrix[15] - 0.02;
+    if(zoomMatrix[13] != -canvasY){
+        zoomMatrix[13] -= 0.02*canvasY;
+    }
+    if(zoomMatrix[12] != -canvasX){
+        zoomMatrix[12] -= 0.02*canvasX;
+    }
     render();
 }
 
-function zoomOut(){
-    zoomMatrix[15] = zoomMatrix[15] + 0.1;
+function zoomOut(canvasX , canvasY){
+    zoomMatrix[15] = zoomMatrix[15] + 0.02;
+    if(zoomMatrix[13] != -canvasY){
+        zoomMatrix[13] += 0.02*canvasY;
+    }
+    if(zoomMatrix[12] != -canvasX){
+        zoomMatrix[12] += 0.02*canvasX;
+    }
     render();
 }
 
@@ -378,5 +407,3 @@ function render() {
     gl.drawArrays(gl.TRIANGLES, 0, index * 3 );
     window.requestAnimationFrame(render);
 }
-//redo undo sonrasi brush erase calismiyor
-//erase sonrasi undo redo
