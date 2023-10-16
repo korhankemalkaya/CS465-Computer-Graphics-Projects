@@ -3,11 +3,13 @@ var gl;
 var vBuffer;
 var cBuffer;
 var redraw = false;
+//Zoom Related
 var zoomMatrixLoc;
 var zoomMatrix = [1,0,0,0,
     0,1,0,0,
     0,0,1,0,
     0,0,0,1];
+
 var colors = [
     vec4(0.0, 0.0, 0.0, 1.0),   // black
     vec4(1.0, 0.0, 0.0, 1.0),   // red
@@ -17,20 +19,34 @@ var colors = [
     vec4(1.0, 0.0, 1.0, 1.0),   // magenta
     vec4(0.0, 1.0, 1.0, 1.0)    // cyan
 ];
+//RECTANGULAR COPY Related
+var copiedTriangles = [];  // added this line to store copied triangles
+var copiedColors = [];  // added this line to store copied colors
+var isSelected = false;
+var rectangle_colors = [
+    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
+    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
+    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
+    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
+];
 
 var triangles = []
 var colorsSaved = []
-
+//UNDO-REDO Related
 var strokeTriangleNumber = 0;
 var strokeStartIndex = 0;
 var strokeNumber = 0;
-
 var strokes = [];
 var strokeColors = [];
-
 var redo = [];
 var redoColors = [];
 var redoPossible = false;
+//RECTANGULAR SELECTION Related
+var selectedTriangles = [];
+var selectedTriangleColors = [];
+var selectionMode = false;
+var isDrawingSelectionRectangle = false;
+var selectionRectangle = { startX: 0, startY: 0, endX: 0, endY: 0 };
 
 var cindex = 0;
 var tool = 0;
@@ -42,6 +58,14 @@ function changed(value){
 
 function toolChanged(value){
     tool = value;
+    selectedTriangles = []; 
+    selectedTriangleColors = [];
+    if (tool == "2") {
+        selectionMode = true;
+    }
+    else {
+        selectionMode = false;
+    }
 }
 
 // Define the maximum number of vertices
@@ -66,6 +90,164 @@ window.onload = function init() {
         }
         if((event.keyCode == 89) && event.ctrlKey){ //redo CTRL + Y
             redoAction();
+        }
+         //Using arrow keys, the user can move the selected triangles by 1 pixel.
+         if (event.keyCode == 37) { //left
+            if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle ) {
+                for (var i = 0; i < selectedTriangles.length; i++) {
+                    for (var j = 0; j < selectedTriangles[i].length; j++) {
+                        selectedTriangles[i][j][0] -= 0.01;
+                    }
+                }
+                //Rectangle should also move with triangles
+                selectionRectangle.startX -= 0.01;
+                selectionRectangle.endX -= 0.01;
+                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
+                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
+                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
+                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                var k = [t1, t2, t3, t4];
+                var flattenedTriangles = triangles.flat();
+                var combinedArray = flattenedTriangles.concat(k);
+               
+                var flattenedColors = colorsSaved.flat();
+                var combinedColors = flattenedColors.concat(rectangle_colors);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW)
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW);
+
+                render();
+            }
+        }
+        if (event.keyCode == 38) { //up
+            if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
+                for (var i = 0; i < selectedTriangles.length; i++) {
+                    for (var j = 0; j < selectedTriangles[i].length; j++) {
+                        selectedTriangles[i][j][1] += 0.01;
+                    }
+                }
+                //Rectangle should also move with triangles
+                selectionRectangle.startY += 0.01;
+                selectionRectangle.endY += 0.01;
+                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
+                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
+                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
+                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                var k = [t1, t2, t3, t4];
+                var flattenedTriangles = triangles.flat();
+                var combinedArray = flattenedTriangles.concat(k);
+                
+                var flattenedColors = colorsSaved.flat();
+                var combinedColors = flattenedColors.concat(rectangle_colors);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW)
+                render();
+            }
+        }
+        if (event.keyCode == 39) { //right
+            if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
+                for (var i = 0; i < selectedTriangles.length; i++) {
+                    for (var j = 0; j < selectedTriangles[i].length; j++) {
+                        selectedTriangles[i][j][0] += 0.01;
+                    }
+                }
+                //Rectangle should also move with triangles
+                selectionRectangle.startX += 0.01;
+                selectionRectangle.endX += 0.01;
+                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
+                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
+                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
+                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                var k = [t1, t2, t3, t4];
+                var flattenedTriangles = triangles.flat();
+                var combinedArray = flattenedTriangles.concat(k);
+                //Erasing should also be available for the selected triangles
+                var flattenedColors = colorsSaved.flat();
+                var combinedColors = flattenedColors.concat(rectangle_colors);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW)
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW)
+                render();
+            }
+        }
+        if (event.keyCode == 40) { //down
+            if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
+                for (var i = 0; i < selectedTriangles.length; i++) {
+                    for (var j = 0; j < selectedTriangles[i].length; j++) {
+                        selectedTriangles[i][j][1] -= 0.01;
+                    }
+                }
+                //Rectangle should also move with triangles
+                selectionRectangle.startY -= 0.01;
+                selectionRectangle.endY -= 0.01;
+                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
+                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
+                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
+                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                var k = [t1, t2, t3, t4];
+                var flattenedTriangles = triangles.flat();
+                var combinedArray = flattenedTriangles.concat(k);
+                var flattenedColors = colorsSaved.flat();
+                var combinedColors = flattenedColors.concat(rectangle_colors);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW)
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW)
+                render();
+            }
+        }
+        //Using CTRL C + CTRL V, the user can copy and paste the selected triangles, triangles pasted should be removable with key arrows
+        if (event.keyCode == 67 && event.ctrlKey) { //CTRL + C
+            if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle && isSelected ) {
+                for (var i = 0; i < selectedTriangles.length; i++) {
+                    var tempV = [];
+                    var tempColor = [];
+                    for (var j = 0; j < selectedTriangles[i].length; j++) {
+                        tempV.push(selectedTriangles[i][j]);
+                        tempColor.push(selectedTriangleColors[i][j]);
+                    }
+                    //Same for colors
+                    copiedTriangles.push(tempV);
+                    copiedColors.push(tempColor);
+                }
+                isSelected = false;
+            }
+        }
+        if (event.keyCode == 86 && event.ctrlKey) { //CTRL + V
+
+            if (copiedTriangles.length > 0 && selectionMode && !isDrawingSelectionRectangle) {
+                for (var i = 0; i < copiedTriangles.length; i++) {
+                    var tempT = [];
+                    var tempC = [];
+                    for (var j = 0; j < copiedTriangles[i].length; j++) {
+                        var temp = vec2(copiedTriangles[i][j][0], copiedTriangles[i][j][1]);
+                        tempT.push(temp);
+                        tempC.push(copiedColors[i][j]);
+                    }
+                    //Same for colors
+                    triangles.push(tempT);
+                    colorsSaved.push(tempC);
+                    index++;
+                }
+
+                // Construct buffer subdata
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()), gl.STATIC_DRAW);
+
+                // Load color
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()), gl.STATIC_DRAW);
+                render();
+                selectedTriangles = copiedTriangles;
+            }
         }
     });
 
@@ -95,6 +277,24 @@ window.onload = function init() {
         if (tool == "0") {
             render();
         }
+       //When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
+       else if (tool == "2")  {
+            selectedTriangles = [];
+            selectedTriangleColors = [];
+            copiedTriangles = [];
+            isSelected = false;
+
+            isDrawingSelectionRectangle = true;
+            selectionRectangle.startX = event.clientX - canvas.getBoundingClientRect().left;
+            selectionRectangle.startY = event.clientY - canvas.getBoundingClientRect().top;
+
+            selectionRectangle.startX = 2 * selectionRectangle.startX / canvas.width - 1;
+            selectionRectangle.startY =  2*(canvas.height - selectionRectangle.startY)/canvas.height -1;
+
+            // Start position is also the end position initially
+            selectionRectangle.endX = selectionRectangle.startX;
+            selectionRectangle.endY = selectionRectangle.startY;
+        }
     });
 
     canvas.addEventListener("mouseup", function(event) {
@@ -115,7 +315,38 @@ window.onload = function init() {
                 redoColors = [];
                 redoPossible= false;
             }       
+        }//When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
+        else if (tool == "2") {
+            //When any vertices of a triangle is outside the rectangular area, the triangle is not selected.
+            //When all vertices of a triangle is inside the rectangular area, the triangle is selected.
+            isSelected = true;
+            isDrawingSelectionRectangle = false;
+            selectionRectangle.endX = event.clientX - canvas.getBoundingClientRect().left;
+            selectionRectangle.endY = event.clientY - canvas.getBoundingClientRect().top;
+            selectionRectangle.endX = 2 * selectionRectangle.endX / canvas.width - 1;
+            selectionRectangle.endY =  2*(canvas.height - selectionRectangle.endY)/canvas.height -1;
+            for (var i = 0; i < triangles.length; i++) {  
+                var currTriangle = triangles[i];
+                var currColor = colorsSaved[i];
+                var put = true; // Assume triangle is selected initially
+                for (var j = 0; j < currTriangle.length; j++) {
+                    var currVertex = currTriangle[j];
+                    // Check if the vertex is OUTSIDE the rectangle
+                    if (currVertex[0] < Math.min(selectionRectangle.startX, selectionRectangle.endX) || 
+                        currVertex[0] > Math.max(selectionRectangle.startX, selectionRectangle.endX) || 
+                        currVertex[1] < Math.min(selectionRectangle.startY, selectionRectangle.endY) || 
+                        currVertex[1] > Math.max(selectionRectangle.startY, selectionRectangle.endY)) {
+                        put = false; // Mark triangle to not be selected as a vertex is outside
+                        break;// No need to check other vertices as we found one outside the rectangle
+                    }
+                }
+                if (put) {
+                    selectedTriangleColors.push(currColor);
+                    selectedTriangles.push(currTriangle);
+                }
+            }          
         }
+        
     });
 
     canvas.addEventListener("mousemove", function(event) {
@@ -276,8 +507,36 @@ window.onload = function init() {
                     index--;
                 }
             }
+      //When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
+      else if (tool == "2") {
+        if (isDrawingSelectionRectangle) {
+            selectionRectangle.endX = event.clientX - canvas.getBoundingClientRect().left;
+            selectionRectangle.endY = event.clientY - canvas.getBoundingClientRect().top;
+            selectionRectangle.endX = 2 * selectionRectangle.endX / canvas.width - 1;
+            selectionRectangle.endY =  2*(canvas.height - selectionRectangle.endY)/canvas.height -1;
+
+            // Draw the rectangle
+            var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
+            var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
+            var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
+            var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+            var k = [t1, t2, t3, t4];
+            var flattenedTriangles = triangles.flat();
+            var combinedArray = flattenedTriangles.concat(k);
+           
+            var flattenedColors = colorsSaved.flat();
+            var combinedColors = flattenedColors.concat(rectangle_colors);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW);
+
+            render();       
         }
-    });
+      }
+    }
+});
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
@@ -414,7 +673,10 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniformMatrix4fv( zoomMatrixLoc, false, flatten(zoomMatrix));
     gl.drawArrays(gl.TRIANGLES, 0, index * 3 );
+
+    if ( tool == "2" && selectionMode ) {
+        gl.drawArrays(gl.LINE_LOOP, index *3, 4);
+    }
     window.requestAnimationFrame(render);
 }
 
-//zoom out drawing

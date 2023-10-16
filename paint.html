@@ -38,7 +38,7 @@ main()
 
 <body>
 <div>
-    <canvas id="gl-canvas" width="900" height="900">
+    <canvas id="gl-canvas" width="600" height="600">
     Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
 </div>
@@ -53,9 +53,10 @@ main()
         <option value = "6">Cyan</option>
     </select>
         
-    <select id = "toolmenu" size = "2" onChange="toolChanged(this.value)">
+    <select id = "toolmenu" size = "3" onChange="toolChanged(this.value)">
         <option value = "0">Brush</option>
         <option value = "1">Eraser</option>
+        <option value = "2">Rectangular Area Selection</option>
     </select>
 
     <button onclick="undoAction()">Undo</button>
