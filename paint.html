@@ -62,6 +62,29 @@ main()
     <button onclick="undoAction()">Undo</button>
     <button onclick="redoAction()">Redo</button>
     <button onclick="resetZoom()">Reset Zoom</button>
+    
+    <form>
+        <label for="topLayer">Select top layer:</label>
+        <select id="topLayer" name="topLayer" onChange="layerChoice()">
+            <option value="0">Layer 1</option>
+            <option value="1">Layer 2</option>
+            <option value="2">Layer 3</option>
+        </select>
+        <br>
+        <label for="middleLayer">Select middle layer:</label>
+        <select id="middleLayer" name="middleLayer" onChange="layerChoice()">
+            <option value="0">Layer 1</option>
+            <option selected value="1">Layer 2</option>
+            <option value="2">Layer 3</option>
+        </select>
+        <br>
+        <label for="bottomLayer">Select middle layer:</label>
+        <select id="bottomLayer" name="bottomLayer" onChange="layerChoice()">
+            <option value="0">Layer 1</option>
+            <option value="1">Layer 2</option>
+            <option selected value="2">Layer 3</option>
+        </select>
+    </form>
 </div>
 </body>
 </html>

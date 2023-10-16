@@ -3,6 +3,7 @@ var gl;
 var vBuffer;
 var cBuffer;
 var redraw = false;
+
 //Zoom Related
 var zoomMatrixLoc;
 var zoomMatrix = [1,0,0,0,
@@ -19,6 +20,7 @@ var colors = [
     vec4(1.0, 0.0, 1.0, 1.0),   // magenta
     vec4(0.0, 1.0, 1.0, 1.0)    // cyan
 ];
+
 //RECTANGULAR COPY Related
 var copiedTriangles = [];  // added this line to store copied triangles
 var copiedColors = [];  // added this line to store copied colors
@@ -32,15 +34,18 @@ var rectangle_colors = [
 
 var triangles = []
 var colorsSaved = []
+
 //UNDO-REDO Related
 var strokeTriangleNumber = 0;
 var strokeStartIndex = 0;
 var strokeNumber = 0;
 var strokes = [];
 var strokeColors = [];
+
 var redo = [];
 var redoColors = [];
 var redoPossible = false;
+
 //RECTANGULAR SELECTION Related
 var selectedTriangles = [];
 var selectedTriangleColors = [];
@@ -78,6 +83,18 @@ var mouseX = 0;
 var mouseY = 0;
 var canvasX = -1;
 var canvasY = +1;
+
+//Layer Related
+var redoLayers = [[] , [] , []];
+var redoPossibleLayers = [false,false,false];
+
+var strokesLayer = [[] , [] , []];
+
+var triangleLayers = [[] , [] , []];
+
+var topLayerIndex = 0;
+var middleLayerIndex = 1;
+var bottomLayerIndex = 2;
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -304,6 +321,8 @@ window.onload = function init() {
             if (strokeTriangleNumber > 0 ) {
                 strokes[strokeNumber] = []
                 strokeColors[strokeNumber] = []
+                strokesLayer[topLayerIndex].push(strokeNumber);
+
                 for(var i = 0; i < strokeTriangleNumber; i++){
                     strokes[strokeNumber].push(triangles[strokeStartIndex + i]);
                     strokeColors[strokeNumber].push(colorsSaved[strokeStartIndex + i]);
@@ -313,8 +332,9 @@ window.onload = function init() {
                 strokeTriangleNumber = 0;
                 strokeNumber++;
                 redo = [];
+                redoLayers[topLayerIndex] = []
                 redoColors = [];
-                redoPossible= false;
+                redoPossibleLayers[topLayerIndex] = false;
             }       
         }//When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
         else if (tool == "2") {
@@ -396,7 +416,7 @@ window.onload = function init() {
             // Calculate center point
             var center_x = x_index * (squareSide) + (squareSide / 2);
             var center_y = y_index * (squareSide) + (squareSide / 2);
-            var center = vec2(center_x, center_y);
+            var center = vec3(center_x, center_y , 0.01);
             
             // Calculate the slope
             slope = (y_rel - (squareSide / 2)) / (x_rel - (squareSide / 2));
@@ -404,10 +424,10 @@ window.onload = function init() {
 
             // Coordinates of the vertex points
             var t;
-            var leftTopC = vec2( x_index *squareSide, y_index*squareSide);
-            var rightTopC = vec2( ( x_index +1 ) * squareSide, y_index *squareSide);
-            var leftBottomC = vec2( x_index *squareSide, ( y_index +1 )*squareSide);
-            var rightBottomC = vec2( (x_index + 1 )*squareSide, ( y_index +1 )*squareSide);
+            var leftTopC = vec3( x_index *squareSide, y_index*squareSide , 0.01);
+            var rightTopC = vec3( ( x_index +1 ) * squareSide, y_index *squareSide , 0.01);
+            var leftBottomC = vec3( x_index *squareSide, ( y_index +1 )*squareSide , 0.01);
+            var rightBottomC = vec3( (x_index + 1 )*squareSide, ( y_index +1 )*squareSide , 0.01);
         
             // Determine which triangle the mouse is on based on slopes
             if (squareType === "leftTop") {
@@ -446,17 +466,17 @@ window.onload = function init() {
 
             // Normalize between -1 and 1
             function normalize(coord, width, height) {
-                return vec2(2 * coord[0] / width - 1, 2*(height - coord[1])/height -1);
+                return vec3(2 * coord[0] / width - 1, 2*(height - coord[1])/height -1 , coord[2]);
             }
             t = t.map(coord => normalize(coord, canvas.width, canvas.height));
 
             if(tool == "0"){
                 var found = false;
                 var iterateIndex = 0;
-                while(!found && iterateIndex < triangles.length){
-                    if(triangles[iterateIndex][0][0] == t[0][0] && triangles[iterateIndex][0][1] == t[0][1]){
-                        if(triangles[iterateIndex][1][0] == t[1][0] && triangles[iterateIndex][1][1] == t[1][1]){
-                            if(triangles[iterateIndex][2][0] == t[2][0] && triangles[iterateIndex][2][1] == t[2][1]){
+                while(!found && iterateIndex < triangleLayers[topLayerIndex].length){
+                    if(triangles[triangleLayers[topLayerIndex][iterateIndex]][0][0] == t[0][0] && triangles[triangleLayers[topLayerIndex][iterateIndex]][0][1] == t[0][1]){
+                        if(triangles[triangleLayers[topLayerIndex][iterateIndex]][1][0] == t[1][0] && triangles[triangleLayers[topLayerIndex][iterateIndex]][1][1] == t[1][1]){
+                            if(triangles[triangleLayers[topLayerIndex][iterateIndex]][2][0] == t[2][0] && triangles[triangleLayers[topLayerIndex][iterateIndex]][2][1] == t[2][1]){
                                 found = true;
                             }
                         }
@@ -465,13 +485,14 @@ window.onload = function init() {
                 }
                 //Check if colors are different
                 if(found){
-                    if(colorsSaved[iterateIndex-1][0][0] != colors[cindex][0] || colorsSaved[iterateIndex-1][0][1] != colors[cindex][1] || colorsSaved[iterateIndex-1][0][2] != colors[cindex][2]){
+                    if(colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][0] != colors[cindex][0] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][1] != colors[cindex][1] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][2] != colors[cindex][2]){
                         found = false;
                     }
                 }
 
                 if(!found){
                     triangles.push(t);
+                    triangleLayers[topLayerIndex].push(triangles.length-1);
                     strokeTriangleNumber += 1;
                     index++;
                 }
@@ -561,10 +582,10 @@ window.onload = function init() {
 
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, 24 * maxNumVertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 36 * maxNumVertices, gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
     cBuffer = gl.createBuffer();
@@ -682,6 +703,150 @@ function resetZoom(){
     render();
 }
 
+function layerChoice(){
+    var firstSelect = document.getElementById("topLayer");
+    var secondSelect = document.getElementById("middleLayer");
+    var thirdSelect = document.getElementById("bottomLayer");
+
+    var topLayer = firstSelect.options[firstSelect.selectedIndex].value;
+    var midLayer = secondSelect.options[secondSelect.selectedIndex].value;
+    var bottomLayer = thirdSelect.options[thirdSelect.selectedIndex].value;
+
+    if(topLayer != midLayer && topLayer != bottomLayer && midLayer != bottomLayer){
+        var oldTopLayer = topLayerIndex;
+        var oldMidLayer = middleLayerIndex;
+        var oldbottomLayer = bottomLayerIndex;
+
+        topLayerIndex = topLayer;
+        middleLayerIndex = midLayer;
+        bottomLayerIndex = bottomLayer;
+
+        var tempTriangles = [];
+        var tempColors = [];
+        var tempTriangleLayers = [[],[],[]];
+
+        var triangleCount = 0;
+
+        if(bottomLayerIndex == oldTopLayer){
+            for(var i = 0; i < triangleLayers[oldTopLayer].length; i++){
+                triangles[triangleLayers[oldTopLayer][i]][0][2] = -0.01;
+                triangles[triangleLayers[oldTopLayer][i]][1][2] = -0.01;
+                triangles[triangleLayers[oldTopLayer][i]][2][2] = -0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldTopLayer][i]]);
+                tempTriangleLayers[oldTopLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldTopLayer][i]]);
+                triangleCount++;
+            }
+        }else if(bottomLayerIndex == oldMidLayer){
+            for(var i = 0; i < triangleLayers[oldMidLayer].length; i++){
+                triangles[triangleLayers[oldMidLayer][i]][0][2] = -0.01;
+                triangles[triangleLayers[oldMidLayer][i]][1][2] = -0.01;
+                triangles[triangleLayers[oldMidLayer][i]][2][2] = -0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldMidLayer][i]]);
+                tempTriangleLayers[oldMidLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldMidLayer][i]]);
+                triangleCount++;
+            }
+        }else if(bottomLayerIndex == oldbottomLayer){
+            for(var i = 0; i < triangleLayers[oldbottomLayer].length; i++){
+                triangles[triangleLayers[oldbottomLayer][i]][0][2] = -0.01;
+                triangles[triangleLayers[oldbottomLayer][i]][1][2] = -0.01;
+                triangles[triangleLayers[oldbottomLayer][i]][2][2] = -0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldbottomLayer][i]]);
+                tempTriangleLayers[oldbottomLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldbottomLayer][i]]);
+                triangleCount++;
+            }
+        }
+
+        if(middleLayerIndex == oldTopLayer){
+            for(var i = 0; i < triangleLayers[oldTopLayer].length; i++){
+                triangles[triangleLayers[oldTopLayer][i]][0][2] = 0.00;
+                triangles[triangleLayers[oldTopLayer][i]][1][2] = 0.00;
+                triangles[triangleLayers[oldTopLayer][i]][2][2] = 0.00;
+    
+                tempTriangles.push(triangles[triangleLayers[oldTopLayer][i]]);
+                tempTriangleLayers[oldTopLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldTopLayer][i]]);
+                triangleCount++;
+            }
+        }else if(middleLayerIndex == oldbottomLayer){
+            for(var i = 0; i < triangleLayers[oldbottomLayer].length; i++){
+                triangles[triangleLayers[oldbottomLayer][i]][0][2] = 0.00;
+                triangles[triangleLayers[oldbottomLayer][i]][1][2] = 0.00;
+                triangles[triangleLayers[oldbottomLayer][i]][2][2] = 0.00;
+    
+                tempTriangles.push(triangles[triangleLayers[oldbottomLayer][i]]);
+                tempTriangleLayers[oldbottomLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldbottomLayer][i]]);
+                triangleCount++;
+            }
+        }else if(middleLayerIndex == oldMidLayer){
+            for(var i = 0; i < triangleLayers[oldMidLayer].length; i++){
+                triangles[triangleLayers[oldMidLayer][i]][0][2] = 0.00;
+                triangles[triangleLayers[oldMidLayer][i]][1][2] = 0.00;
+                triangles[triangleLayers[oldMidLayer][i]][2][2] = 0.00;
+    
+                tempTriangles.push(triangles[triangleLayers[oldMidLayer][i]]);
+                tempTriangleLayers[oldMidLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldMidLayer][i]]);
+                triangleCount++;
+            }
+        }
+
+        if(topLayerIndex == oldMidLayer){
+            for(var i = 0; i < triangleLayers[oldMidLayer].length; i++){
+                triangles[triangleLayers[oldMidLayer][i]][0][2] = 0.01;
+                triangles[triangleLayers[oldMidLayer][i]][1][2] = 0.01;
+                triangles[triangleLayers[oldMidLayer][i]][2][2] = 0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldMidLayer][i]]);
+                tempTriangleLayers[oldMidLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldMidLayer][i]]);
+                triangleCount++;
+            }
+        }else if(topLayerIndex == oldbottomLayer){
+            for(var i = 0; i < triangleLayers[oldbottomLayer].length; i++){
+                triangles[triangleLayers[oldbottomLayer][i]][0][2] = 0.01;
+                triangles[triangleLayers[oldbottomLayer][i]][1][2] = 0.01;
+                triangles[triangleLayers[oldbottomLayer][i]][2][2] = 0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldbottomLayer][i]]);
+                tempTriangleLayers[oldbottomLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldbottomLayer][i]]);
+                triangleCount++;
+            }
+        }else if(topLayerIndex == oldTopLayer){
+            for(var i = 0; i < triangleLayers[oldTopLayer].length; i++){
+                triangles[triangleLayers[oldTopLayer][i]][0][2] = 0.01;
+                triangles[triangleLayers[oldTopLayer][i]][1][2] = 0.01;
+                triangles[triangleLayers[oldTopLayer][i]][2][2] = 0.01;
+    
+                tempTriangles.push(triangles[triangleLayers[oldTopLayer][i]]);
+                tempTriangleLayers[oldTopLayer].push(triangleCount);
+                tempColors.push(colorsSaved[triangleLayers[oldTopLayer][i]]);
+                triangleCount++;
+            }
+        }
+    
+        console.log(triangles.length);
+        console.log(tempTriangles.length);
+        triangles = tempTriangles;
+        triangleLayers = tempTriangleLayers;
+        colorsSaved = tempColors;
+
+        gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
+    
+        gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
+        render();
+    }
+}
+
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniformMatrix4fv( zoomMatrixLoc, false, flatten(zoomMatrix));
@@ -693,3 +858,11 @@ function render() {
     window.requestAnimationFrame(render);
 }
 
+//rectengular area not erasing
+//copy paste color mixup
+//zoom drawing
+//original color not drawing after overdraw with another color
+//save load
+//erase layer
+//undo redo layer
+//rectangle layer
