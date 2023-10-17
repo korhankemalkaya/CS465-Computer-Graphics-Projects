@@ -245,7 +245,7 @@ window.onload = function init() {
                     var tempT = [];
                     var tempC = [];
                     for (var j = 0; j < copiedTriangles[i].length; j++) {
-                        var temp = vec2(copiedTriangles[i][j][0], copiedTriangles[i][j][1]);
+                        var temp = vec3(copiedTriangles[i][j][0], copiedTriangles[i][j][1], copiedTriangles[i][j][2]);
                         tempT.push(temp);
                         var tempc = vec4(copiedColors[i][j][0], copiedColors[i][j][1], copiedColors[i][j][2], copiedColors[i][j][3]);
                         tempC.push(tempc);
