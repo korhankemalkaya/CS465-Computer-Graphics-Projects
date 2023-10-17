@@ -144,7 +144,7 @@ window.onload = function init() {
                 var flattenedColors = colorsSaved.flat();
                 var combinedColors = flattenedColors.concat(rectangle_colors);
 
-                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                   gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedColors), gl.STATIC_DRAW);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, flatten(combinedArray), gl.STATIC_DRAW)
@@ -959,6 +959,5 @@ function toolChanged(value){
 }
 
 //original color not drawing after overdraw with another color
-//erase layer
 //undo redo layer
 //rectangle layer
