@@ -507,9 +507,9 @@ window.onload = function init() {
                 var delIndex = -1;
 
                 while (!found && iterateIndex < triangles.length) {
-                    if (areEqual(triangles[iterateIndex][0][0], t[0][0]) && areEqual(triangles[iterateIndex][0][1], t[0][1])) {
-                        if (areEqual(triangles[iterateIndex][1][0], t[1][0]) && areEqual(triangles[iterateIndex][1][1], t[1][1])) {
-                            if (areEqual(triangles[iterateIndex][2][0], t[2][0]) && areEqual(triangles[iterateIndex][2][1], t[2][1])) {
+                    if (areEqual(triangles[iterateIndex][0][0], t[0][0]) && areEqual(triangles[iterateIndex][0][1], t[0][1]) && areEqual(triangles[iterateIndex][0][2], 0.01)) {
+                        if (areEqual(triangles[iterateIndex][1][0], t[1][0]) && areEqual(triangles[iterateIndex][1][1], t[1][1])&& areEqual(triangles[iterateIndex][0][2], 0.01)) {
+                            if (areEqual(triangles[iterateIndex][2][0], t[2][0]) && areEqual(triangles[iterateIndex][2][1], t[2][1])&& areEqual(triangles[iterateIndex][0][2], 0.01)) {
                                 delIndex = iterateIndex;
                                 found = true;
                             }
@@ -521,6 +521,20 @@ window.onload = function init() {
                 if(found){                    
                     triangles.splice(delIndex,1);
                     colorsSaved.splice(delIndex,1);
+
+                    for(var i = 0; i < triangleLayers[topLayerIndex].length; i++){
+                        if(triangleLayers[topLayerIndex][i] == delIndex){
+                            triangleLayers[topLayerIndex].splice(i,1);
+                        }
+                    }
+
+                    for(var t = 0; t < 3; t++){
+                        for(var z = 0; z < triangleLayers[t].length; z++){
+                            if(triangleLayers[t][z] > delIndex){
+                                triangleLayers[t][z] = triangleLayers[t][z] - 1;
+                            } 
+                        }
+                    }
 
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
                     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
@@ -948,5 +962,3 @@ function toolChanged(value){
 //erase layer
 //undo redo layer
 //rectangle layer
-//copy paste color mixup
-//not drawing after erase
