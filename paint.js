@@ -522,6 +522,20 @@ window.onload = function init() {
                     triangles.splice(delIndex,1);
                     colorsSaved.splice(delIndex,1);
 
+                    for(var i = 0; i < triangleLayers[topLayerIndex].length; i++){
+                        if(triangleLayers[topLayerIndex][i] == delIndex){
+                            triangleLayers[topLayerIndex].splice(i,1);
+                        }
+                    }
+
+                    for(var t = 0; t < 3; t++){
+                        for(var z = 0; z < triangleLayers[t].length; z++){
+                            if(triangleLayers[t][z] > delIndex){
+                                triangleLayers[t][z] = triangleLayers[t][z] - 1;
+                            } 
+                        }
+                    }
+
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
                     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
