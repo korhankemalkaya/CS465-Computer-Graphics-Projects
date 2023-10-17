@@ -56,23 +56,6 @@ var selectionRectangle = { startX: 0, startY: 0, endX: 0, endY: 0 , startZ: 0, e
 var cindex = 0;
 var tool = 0;
 
-// Get the chosen color
-function changed(value){
-    cindex = value;
-}
-
-function toolChanged(value){
-    tool = value;
-    selectedTriangles = []; 
-    selectedTriangleColors = [];
-    if (tool == "2") {
-        selectionMode = true;
-    }
-    else {
-        selectionMode = false;
-    }
-}
-
 // Define the maximum number of vertices
 var maxNumVertices = 3600*3; // 3600 triangles
 
@@ -380,6 +363,8 @@ window.onload = function init() {
                     selectedTriangles.push(triangleMap[key].triangle);
                 }
             
+            }else if(tool == "1"){
+                redraw = false;
             }
             
     });
@@ -487,7 +472,10 @@ window.onload = function init() {
                 }
                 //Check if colors are different
                 if(found){
-                    if(colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][0] != colors[cindex][0] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][1] != colors[cindex][1] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][2] != colors[cindex][2]){
+                    if(colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][0] != colors[cindex][0] 
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][1] != colors[cindex][1] 
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][2] != colors[cindex][2]
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][3] != colors[cindex][3]){
                         found = false;
                     }
                 }
@@ -921,8 +909,9 @@ function loadImage(event) {
    
            gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
            gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
-           render();
+           
        }
+       render();
    };
    reader.readAsText(file); // Read the file as text
 }
@@ -938,8 +927,26 @@ function render() {
     window.requestAnimationFrame(render);
 }
 
-//copy paste color mixup
+// Get the chosen color
+function changed(value){
+    cindex = value;
+}
+
+function toolChanged(value){
+    tool = value;
+    selectedTriangles = []; 
+    selectedTriangleColors = [];
+    if (tool == "2") {
+        selectionMode = true;
+    }
+    else {
+        selectionMode = false;
+    }
+}
+
 //original color not drawing after overdraw with another color
 //erase layer
 //undo redo layer
 //rectangle layer
+//copy paste color mixup
+//not drawing after erase
