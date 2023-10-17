@@ -508,8 +508,8 @@ window.onload = function init() {
 
                 while (!found && iterateIndex < triangles.length) {
                     if (areEqual(triangles[iterateIndex][0][0], t[0][0]) && areEqual(triangles[iterateIndex][0][1], t[0][1]) && areEqual(triangles[iterateIndex][0][2], 0.01)) {
-                        if (areEqual(triangles[iterateIndex][1][0], t[1][0]) && areEqual(triangles[iterateIndex][1][1], t[1][1])&& areEqual(triangles[iterateIndex][0][2], 0.01)) {
-                            if (areEqual(triangles[iterateIndex][2][0], t[2][0]) && areEqual(triangles[iterateIndex][2][1], t[2][1])&& areEqual(triangles[iterateIndex][0][2], 0.01)) {
+                        if (areEqual(triangles[iterateIndex][1][0], t[1][0]) && areEqual(triangles[iterateIndex][1][1], t[1][1])&& areEqual(triangles[iterateIndex][1][2], 0.01)) {
+                            if (areEqual(triangles[iterateIndex][2][0], t[2][0]) && areEqual(triangles[iterateIndex][2][1], t[2][1])&& areEqual(triangles[iterateIndex][2][2], 0.01)) {
                                 delIndex = iterateIndex;
                                 found = true;
                             }
