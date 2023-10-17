@@ -363,6 +363,8 @@ window.onload = function init() {
                     selectedTriangles.push(triangleMap[key].triangle);
                 }
             
+            }else if(tool == "1"){
+                redraw = false;
             }
             
     });
