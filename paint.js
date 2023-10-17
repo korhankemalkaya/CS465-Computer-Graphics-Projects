@@ -878,10 +878,12 @@ function saveImage() {
             data += triangleLayers[i][y] + " ";
         }
         data += triangleLayers[i][triangleLayers[i].length-1];
-        if(i != triangleLayers.length-1){
+        if(i != 2){
             data += "\n"
         }
     }
+
+    //data += topLayerIndex + " " + middleLayerIndex + " " + bottomLayerIndex;
 
     // Create a Blob containing the text content
     const blob = new Blob([data], { type: 'text/plain' });
@@ -905,39 +907,28 @@ function loadImage(event) {
     reader.onload = function(event) {
         const fileContent = event.target.result;
         const lines = fileContent.split('\n'); // Split the content into lines
-        var isLayers = false;
-        var tempLayerIndex = 0;
 
-        for(var i = 0; i < lines.length; i++){
+        for(var i = 0; i < lines.length-3; i++){
             const words = lines[i].split(' ');
-            if(words[0] !== "Layers"){
-                triangles[i] = [];
-                var v1 = vec3(parseFloat(words[0]) , parseFloat(words[1]) , parseFloat(words[2]));
-                var v2 = vec3(parseFloat(words[3]) , parseFloat(words[4]) , parseFloat(words[5]));
-                var v3 = vec3(parseFloat(words[6]) , parseFloat(words[7]) , parseFloat(words[8]));
+            triangles[i] = [];
+            var v1 = vec3(parseFloat(words[0]) , parseFloat(words[1]) , parseFloat(words[2]));
+            var v2 = vec3(parseFloat(words[3]) , parseFloat(words[4]) , parseFloat(words[5]));
+            var v3 = vec3(parseFloat(words[6]) , parseFloat(words[7]) , parseFloat(words[8]));
 
-                triangles[i].push(v1);
-                triangles[i].push(v2);
-                triangles[i].push(v3);
+            triangles[i].push(v1);
+            triangles[i].push(v2);
+            triangles[i].push(v3);
 
-                colorsSaved[i] = [];
-                var c1 = vec4(parseFloat(words[9]) , parseFloat(words[10]) , parseFloat(words[11]) , parseFloat(words[12]));
-                var c2 = vec4(parseFloat(words[13]) , parseFloat(words[14]) , parseFloat(words[15]) , parseFloat(words[16]));
-                var c3 = vec4(parseFloat(words[17]) , parseFloat(words[18]) , parseFloat(words[19]) , parseFloat(words[20]));
+            colorsSaved[i] = [];
+            var c1 = vec4(parseFloat(words[9]) , parseFloat(words[10]) , parseFloat(words[11]) , parseFloat(words[12]));
+            var c2 = vec4(parseFloat(words[13]) , parseFloat(words[14]) , parseFloat(words[15]) , parseFloat(words[16]));
+            var c3 = vec4(parseFloat(words[17]) , parseFloat(words[18]) , parseFloat(words[19]) , parseFloat(words[20]));
 
-                colorsSaved[i].push(c1);
-                colorsSaved[i].push(c2);
-                colorsSaved[i].push(c3);
+            colorsSaved[i].push(c1);
+            colorsSaved[i].push(c2);
+            colorsSaved[i].push(c3);
 
-                index++;
-            }else if(words[0] === "Layers"){
-                isLayers = true;
-            }else if(isLayers){
-                for(var i = 0; i < words.length; i++){
-                    triangleLayers[tempLayerIndex][i] = parseFloat(words[i]);
-                }
-                tempLayerIndex += 1;
-            }
+            index++;
 
             gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
             gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
@@ -946,7 +937,18 @@ function loadImage(event) {
             gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
            
         }
-       render();
+        var counter = 0;
+        for(var j = lines.length-3; j < lines.length ;j++){
+            const words = lines[j].split(' ');
+            for(var t = 0; t < words.length; t++){
+                triangleLayers[counter][t] = parseFloat(words[t]);
+            }
+            counter++;
+        }
+        console.log(triangleLayers[0]);
+        console.log(triangleLayers[1]);
+        console.log(triangleLayers[2]);
+        render();
    };
    reader.readAsText(file); // Read the file as text
 }
