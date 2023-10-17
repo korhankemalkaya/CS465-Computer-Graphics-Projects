@@ -470,7 +470,10 @@ window.onload = function init() {
                 }
                 //Check if colors are different
                 if(found){
-                    if(colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][0] != colors[cindex][0] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][1] != colors[cindex][1] || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][2] != colors[cindex][2]){
+                    if(colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][0] != colors[cindex][0] 
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][1] != colors[cindex][1] 
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][2] != colors[cindex][2]
+                        || colorsSaved[triangleLayers[topLayerIndex][iterateIndex-1]][0][3] != colors[cindex][3]){
                         found = false;
                     }
                 }
