@@ -840,8 +840,6 @@ function layerChoice(){
             }
         }
     
-        console.log(triangles.length);
-        console.log(tempTriangles.length);
         triangles = tempTriangles;
         triangleLayers = tempTriangleLayers;
         colorsSaved = tempColors;
@@ -863,12 +861,24 @@ function saveImage() {
     let data = "";
     for(var i = 0; i < triangles.length; i++){
         for(var j = 0; j < triangles[i].length; j++){
-            data += triangles[i][j][0] + " " + triangles[i][j][1] + " " + "0.01 ";
+            data += triangles[i][j][0] + " " + triangles[i][j][1] + " " + triangles[i][j][2] + " ";
         }
         data += colorsSaved[i][0][0] + " " + colorsSaved[i][0][1] + " " + colorsSaved[i][0][2] + " " + colorsSaved[i][0][3] + " ";
         data += colorsSaved[i][1][0] + " " + colorsSaved[i][1][1] + " " + colorsSaved[i][1][2] + " " + colorsSaved[i][1][3] + " ";
         data += colorsSaved[i][2][0] + " " + colorsSaved[i][2][1] + " " + colorsSaved[i][2][2] + " " + colorsSaved[i][2][3]; 
         if(i != triangles.length-1){
+            data += "\n"
+        }
+    }
+
+    data += "\nLayers\n";
+
+    for(var i = 0; i < 3; i++){
+        for(var y = 0; y < triangleLayers[i].length-1; y++){
+            data += triangleLayers[i][y] + " ";
+        }
+        data += triangleLayers[i][triangleLayers[i].length-1];
+        if(i != triangleLayers.length-1){
             data += "\n"
         }
     }
@@ -889,42 +899,53 @@ function saveImage() {
 
 function loadImage(event) {
     // Get the selected file
-   const file = event.target.files[0];
-   const reader = new FileReader();
+    const file = event.target.files[0];
+    const reader = new FileReader();
  
-   reader.onload = function(event) {
-       const fileContent = event.target.result;
-       const lines = fileContent.split('\n'); // Split the content into lines
+    reader.onload = function(event) {
+        const fileContent = event.target.result;
+        const lines = fileContent.split('\n'); // Split the content into lines
+        var isLayers = false;
+        var tempLayerIndex = 0;
 
-       for(var i = 0; i < lines.length; i++){
-           const words = lines[i].split(' ');
-           triangles[i] = [];
-           var v1 = vec3(parseFloat(words[0]) , parseFloat(words[1]) , parseFloat(words[2]));
-           var v2 = vec3(parseFloat(words[3]) , parseFloat(words[4]) , parseFloat(words[5]));
-           var v3 = vec3(parseFloat(words[6]) , parseFloat(words[7]) , parseFloat(words[8]));
+        for(var i = 0; i < lines.length; i++){
+            const words = lines[i].split(' ');
+            if(words[0] !== "Layers"){
+                triangles[i] = [];
+                var v1 = vec3(parseFloat(words[0]) , parseFloat(words[1]) , parseFloat(words[2]));
+                var v2 = vec3(parseFloat(words[3]) , parseFloat(words[4]) , parseFloat(words[5]));
+                var v3 = vec3(parseFloat(words[6]) , parseFloat(words[7]) , parseFloat(words[8]));
 
-           triangles[i].push(v1);
-           triangles[i].push(v2);
-           triangles[i].push(v3);
+                triangles[i].push(v1);
+                triangles[i].push(v2);
+                triangles[i].push(v3);
 
-           colorsSaved[i] = [];
-           var c1 = vec4(parseFloat(words[9]) , parseFloat(words[10]) , parseFloat(words[11]) , parseFloat(words[12]));
-           var c2 = vec4(parseFloat(words[13]) , parseFloat(words[14]) , parseFloat(words[15]) , parseFloat(words[16]));
-           var c3 = vec4(parseFloat(words[17]) , parseFloat(words[18]) , parseFloat(words[19]) , parseFloat(words[20]));
+                colorsSaved[i] = [];
+                var c1 = vec4(parseFloat(words[9]) , parseFloat(words[10]) , parseFloat(words[11]) , parseFloat(words[12]));
+                var c2 = vec4(parseFloat(words[13]) , parseFloat(words[14]) , parseFloat(words[15]) , parseFloat(words[16]));
+                var c3 = vec4(parseFloat(words[17]) , parseFloat(words[18]) , parseFloat(words[19]) , parseFloat(words[20]));
 
-           colorsSaved[i].push(c1);
-           colorsSaved[i].push(c2);
-           colorsSaved[i].push(c3);
+                colorsSaved[i].push(c1);
+                colorsSaved[i].push(c2);
+                colorsSaved[i].push(c3);
 
-           index++;
+                index++;
+            }else if(words[0] === "Layers"){
+                isLayers = true;
+            }else if(isLayers){
+                for(var i = 0; i < words.length; i++){
+                    triangleLayers[tempLayerIndex][i] = parseFloat(words[i]);
+                }
+                tempLayerIndex += 1;
+            }
 
-           gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-           gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
+            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
    
-           gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-           gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
+            gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
            
-       }
+        }
        render();
    };
    reader.readAsText(file); // Read the file as text
@@ -959,6 +980,5 @@ function toolChanged(value){
 }
 
 //original color not drawing after overdraw with another color
-//erase layer
 //undo redo layer
 //rectangle layer
