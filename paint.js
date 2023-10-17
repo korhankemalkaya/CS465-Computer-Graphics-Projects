@@ -949,3 +949,4 @@ function toolChanged(value){
 //undo redo layer
 //rectangle layer
 //copy paste color mixup
+//not drawing after erase
