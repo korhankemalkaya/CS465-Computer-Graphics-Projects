@@ -63,32 +63,26 @@
                 <form>
                     <label for="topLayer">Select top layer:</label>
                     <select id="topLayer" name="topLayer" onChange="layerChoice()">
-                        <option value="" selected disabled hidden>Select a layer</option>
-                        <option value="">Your choice is...</option>
-                        <option value="1">Layer 1</option>
-                        <option value="2">Layer 2</option>
-                        <option value="3">Layer 3</option>
+                        <option value="0">Layer 1</option>
+                        <option value="1">Layer 2</option>
+                        <option value="2">Layer 3</option>
                     </select>
                     <br>
                     <label for="middleLayer">Select middle layer:</label>
                     <select id="middleLayer" name="middleLayer" onChange="layerChoice()">
-                        <option value="" selected disabled hidden>Select a layer</option>
-                        <option value="">Your choice is...</option>
-                        <option value="1">Layer 1</option>
-                        <option value="2">Layer 2</option>
-                        <option value="3">Layer 3</option>
+                        <option value="0">Layer 1</option>
+                        <option selected value="1">Layer 2</option>
+                        <option value="2">Layer 3</option>
                     </select>
                     <br>
-                    <label for="bottomLayer">Select bottom layer:</label>
+                    <label for="bottomLayer">Select middle layer:</label>
                     <select id="bottomLayer" name="bottomLayer" onChange="layerChoice()">
-                        <option value="" selected disabled hidden>Select a layer</option>
-                        <option value="">Your choice is...</option>
-                        <option value="1">Layer 1</option>
-                        <option value="2">Layer 2</option>
-                        <option value="3">Layer 3</option>
+                        <option value="0">Layer 1</option>
+                        <option value="1">Layer 2</option>
+                        <option selected value="2">Layer 3</option>
                     </select>
                 </form>
-                <br>
+            
                 <div class="mb-3">
                     <button class="btn btn-success" onclick="saveImage()">Save Image</button>
                 </div>
@@ -137,31 +131,24 @@
     <script type="text/javascript" src="Common/MV.js"></script>
     <script type="text/javascript" src="paint.js"></script>
 
-    <!-- Layer selection script -->
-    <script>
-        function layerChoice() {
-            var topLayer = document.getElementById('topLayer');
-            var middleLayer = document.getElementById('middleLayer');
-            var bottomLayer = document.getElementById('bottomLayer');
-            
-            var selectedValues = [
-                topLayer.value,
-                middleLayer.value,
-                bottomLayer.value
-            ];
+    <!-- Layer selection script 
+    <script> /*
+    function layerChoice() {
+        var topLayer = document.getElementById('topLayer');
+        var middleLayer = document.getElementById('middleLayer');
+        var bottomLayer = document.getElementById('bottomLayer');
 
-            // Filter out empty values
-            selectedValues = selectedValues.filter(function(value) {
-                return value !== "";
+        var layers = [topLayer, middleLayer, bottomLayer];
+
+        layers.forEach(function (layer1) {
+            var otherLayers = layers.filter(layer => layer !== layer1);
+            otherLayers.forEach(function (layer2) {
+                var option = layer2.querySelector('option[value="' + layer1.value + '"]');
+                if (option) option.disabled = layer1.value !== "";
             });
-
-            for (var i = 1; i <= 3; i++) {
-                document.querySelectorAll('option[value="' + i + '"]').forEach(function(option) {
-                    option.disabled = selectedValues.includes(option.value) && option.parentElement.value !== option.value;
-                });
-            }
-        }
-    </script>
+        });
+    }*/
+    </script>-->
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
