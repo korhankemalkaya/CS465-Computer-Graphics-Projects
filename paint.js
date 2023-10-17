@@ -51,7 +51,7 @@ var selectedTriangles = [];
 var selectedTriangleColors = [];
 var selectionMode = false;
 var isDrawingSelectionRectangle = false;
-var selectionRectangle = { startX: 0, startY: 0, endX: 0, endY: 0 };
+var selectionRectangle = { startX: 0, startY: 0, endX: 0, endY: 0 , startZ: 0, endZ:0};
 
 var cindex = 0;
 var tool = 0;
@@ -113,16 +113,16 @@ window.onload = function init() {
             if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle ) {
                 for (var i = 0; i < selectedTriangles.length; i++) {
                     for (var j = 0; j < selectedTriangles[i].length; j++) {
-                        selectedTriangles[i][j][0] -= 0.01;
+                        selectedTriangles[i][j][0] -= 0.066667;
                     }
                 }
                 //Rectangle should also move with triangles
-                selectionRectangle.startX -= 0.01;
-                selectionRectangle.endX -= 0.01;
-                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
-                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
-                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
-                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                selectionRectangle.startX -= 0.066667;
+                selectionRectangle.endX -= 0.066667;
+                var t1 = vec3(selectionRectangle.startX, selectionRectangle.startY, 0.0);
+                var t2 = vec3(selectionRectangle.endX, selectionRectangle.startY, 0.0);
+                var t3 = vec3(selectionRectangle.endX, selectionRectangle.endY, 0.0);
+                var t4 = vec3(selectionRectangle.startX, selectionRectangle.endY,0.0);
                 var k = [t1, t2, t3, t4];
                 var flattenedTriangles = triangles.flat();
                 var combinedArray = flattenedTriangles.concat(k);
@@ -142,16 +142,16 @@ window.onload = function init() {
             if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
                 for (var i = 0; i < selectedTriangles.length; i++) {
                     for (var j = 0; j < selectedTriangles[i].length; j++) {
-                        selectedTriangles[i][j][1] += 0.01;
+                        selectedTriangles[i][j][1] += 0.066667;
                     }
                 }
                 //Rectangle should also move with triangles
-                selectionRectangle.startY += 0.01;
-                selectionRectangle.endY += 0.01;
-                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
-                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
-                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
-                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                selectionRectangle.startY += 0.066667;
+                selectionRectangle.endY += 0.066667;
+                var t1 = vec3(selectionRectangle.startX, selectionRectangle.startY, 0.0);
+                var t2 = vec3(selectionRectangle.endX, selectionRectangle.startY, 0.0);
+                var t3 = vec3(selectionRectangle.endX, selectionRectangle.endY, 0.0);
+                var t4 = vec3(selectionRectangle.startX, selectionRectangle.endY,0.0);
                 var k = [t1, t2, t3, t4];
                 var flattenedTriangles = triangles.flat();
                 var combinedArray = flattenedTriangles.concat(k);
@@ -170,16 +170,16 @@ window.onload = function init() {
             if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
                 for (var i = 0; i < selectedTriangles.length; i++) {
                     for (var j = 0; j < selectedTriangles[i].length; j++) {
-                        selectedTriangles[i][j][0] += 0.01;
+                        selectedTriangles[i][j][0] += 0.066667;
                     }
                 }
                 //Rectangle should also move with triangles
-                selectionRectangle.startX += 0.01;
-                selectionRectangle.endX += 0.01;
-                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
-                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
-                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
-                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                selectionRectangle.startX += 0.066667;
+                selectionRectangle.endX += 0.066667;
+                var t1 = vec3(selectionRectangle.startX, selectionRectangle.startY, 0.0);
+                var t2 = vec3(selectionRectangle.endX, selectionRectangle.startY, 0.0);
+                var t3 = vec3(selectionRectangle.endX, selectionRectangle.endY, 0.0);
+                var t4 = vec3(selectionRectangle.startX, selectionRectangle.endY,0.0);
                 var k = [t1, t2, t3, t4];
                 var flattenedTriangles = triangles.flat();
                 var combinedArray = flattenedTriangles.concat(k);
@@ -198,16 +198,16 @@ window.onload = function init() {
             if (selectedTriangles.length > 0 && selectionMode  && !isDrawingSelectionRectangle) {
                 for (var i = 0; i < selectedTriangles.length; i++) {
                     for (var j = 0; j < selectedTriangles[i].length; j++) {
-                        selectedTriangles[i][j][1] -= 0.01;
+                        selectedTriangles[i][j][1] -= 0.066667;
                     }
                 }
                 //Rectangle should also move with triangles
-                selectionRectangle.startY -= 0.01;
-                selectionRectangle.endY -= 0.01;
-                var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
-                var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
-                var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
-                var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+                selectionRectangle.startY -= 0.066667;
+                selectionRectangle.endY -= 0.066667;
+                var t1 = vec3(selectionRectangle.startX, selectionRectangle.startY, 0.0);
+                var t2 = vec3(selectionRectangle.endX, selectionRectangle.startY, 0.0);
+                var t3 = vec3(selectionRectangle.endX, selectionRectangle.endY, 0.0);
+                var t4 = vec3(selectionRectangle.startX, selectionRectangle.endY,0.0);
                 var k = [t1, t2, t3, t4];
                 var flattenedTriangles = triangles.flat();
                 var combinedArray = flattenedTriangles.concat(k);
@@ -516,10 +516,10 @@ window.onload = function init() {
                 var iterateIndex = 0;
                 var delIndex = -1;
 
-                while(!found && iterateIndex < triangles.length){
-                    if(triangles[iterateIndex][0][0] == t[0][0] && triangles[iterateIndex][0][1] == t[0][1]){
-                        if(triangles[iterateIndex][1][0] == t[1][0] && triangles[iterateIndex][1][1] == t[1][1]){
-                            if(triangles[iterateIndex][2][0] == t[2][0] && triangles[iterateIndex][2][1] == t[2][1]){
+                while (!found && iterateIndex < triangles.length) {
+                    if (areEqual(triangles[iterateIndex][0][0], t[0][0]) && areEqual(triangles[iterateIndex][0][1], t[0][1])) {
+                        if (areEqual(triangles[iterateIndex][1][0], t[1][0]) && areEqual(triangles[iterateIndex][1][1], t[1][1])) {
+                            if (areEqual(triangles[iterateIndex][2][0], t[2][0]) && areEqual(triangles[iterateIndex][2][1], t[2][1])) {
                                 delIndex = iterateIndex;
                                 found = true;
                             }
@@ -550,10 +550,10 @@ window.onload = function init() {
             selectionRectangle.endY =  2*(canvas.height - selectionRectangle.endY)/canvas.height -1;
 
             // Draw the rectangle
-            var t1 = vec2(selectionRectangle.startX, selectionRectangle.startY);
-            var t2 = vec2(selectionRectangle.endX, selectionRectangle.startY);
-            var t3 = vec2(selectionRectangle.endX, selectionRectangle.endY);
-            var t4 = vec2(selectionRectangle.startX, selectionRectangle.endY);
+            var t1 = vec3(selectionRectangle.startX, selectionRectangle.startY, 0.0);
+            var t2 = vec3(selectionRectangle.endX, selectionRectangle.startY, 0.0);
+            var t3 = vec3(selectionRectangle.endX, selectionRectangle.endY, 0.0);
+            var t4 = vec3(selectionRectangle.startX, selectionRectangle.endY,0.0);
             var k = [t1, t2, t3, t4];
             var flattenedTriangles = triangles.flat();
             var combinedArray = flattenedTriangles.concat(k);
@@ -846,7 +846,9 @@ function layerChoice(){
         render();
     }
 }
-
+function areEqual(a, b, epsilon = 0.001) {
+    return Math.abs(a - b) < epsilon;
+}
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniformMatrix4fv( zoomMatrixLoc, false, flatten(zoomMatrix));
@@ -858,9 +860,8 @@ function render() {
     window.requestAnimationFrame(render);
 }
 
-//rectengular area not erasing
 //copy paste color mixup
-//zoom drawing
+//zoom drawing (not sure if required)
 //original color not drawing after overdraw with another color
 //save load
 //erase layer
