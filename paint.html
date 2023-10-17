@@ -1,92 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-<script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
-attribute vec4 vColor;
-    
-varying vec4 fColor;
-    
-uniform mat4 zoomMatrix;
-    
-void
-main()
-{
-    gl_Position = zoomMatrix * vPosition;
-    fColor = vColor;
-    gl_PointSize = 10.0;
-}
-</script>
-
-<script id="fragment-shader" type="x-shader/x-fragment">
-
-precision mediump float;
-
-varying vec4 fColor;
-
-void
-main()
-{
-    gl_FragColor = fColor;
-}
-</script>
-
-<script type="text/javascript" src="Common\webgl-utils.js"></script>
-<script type="text/javascript" src="Common/initShaders.js"></script>
-<script type="text/javascript" src="Common/MV.js"></script>
-<script type="text/javascript" src="paint.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #511c1c;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            border-radius: 0;
+        }
+        canvas {
+            border: 2px solid #000;
+        }
+    </style>
+    <title>Artistic Paint Application</title>
+</head>
 
 <body>
-<div>
-    <canvas id="gl-canvas" width="600" height="600">
-    Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-</div>
-<div>
-    <select id = "colormenu" size = "7" onChange="changed(this.value)">
-        <option value = "0">Black</option>
-        <option value = "1">Red</option>
-        <option value = "2">Yellow</option>
-        <option value = "3">Green</option>
-        <option value = "4">Blue</option>
-        <option value = "5">Magenta</option>
-        <option value = "6">Cyan</option>
-    </select>
-        
-    <select id = "toolmenu" size = "3" onChange="toolChanged(this.value)">
-        <option value = "0">Brush</option>
-        <option value = "1">Eraser</option>
-        <option value = "2">Rectangular Area Selection</option>
-    </select>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <canvas id="gl-canvas" width="600" height="600" class="border bg-white">
+                    Oops ... your browser doesn't support the HTML5 canvas element
+                </canvas>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="colormenu" class="form-label">Select Color</label>
+                    <select id="colormenu" class="form-control" size="7" onChange="changed(this.value)">
+                        <option value = "0">Black</option>
+                        <option value = "1">Red</option>
+                        <option value = "2">Yellow</option>
+                        <option value = "3">Green</option>
+                        <option value = "4">Blue</option>
+                        <option value = "5">Magenta</option>
+                        <option value = "6">Cyan</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="toolmenu" class="form-label">Select Tool</label>
+                    <select id="toolmenu" class="form-control" size="3" onChange="toolChanged(this.value)">
+                        <option value = "0">Brush</option>
+                        <option value = "1">Eraser</option>
+                        <option value = "2">Rectangular Area Selection</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary" onclick="undoAction()">Undo</button>
+                    <button class="btn btn-primary" onclick="redoAction()">Redo</button>
+                    <button class="btn btn-primary" onclick="resetZoom()">Reset Zoom</button>
+                </div>
+                <form>
+                    <label for="topLayer">Select top layer:</label>
+                    <select id="topLayer" name="topLayer" onChange="layerChoice()">
+                        <option value="" selected disabled hidden>Select a layer</option>
+                        <option value="">Your choice is...</option>
+                        <option value="1">Layer 1</option>
+                        <option value="2">Layer 2</option>
+                        <option value="3">Layer 3</option>
+                    </select>
+                    <br>
+                    <label for="middleLayer">Select middle layer:</label>
+                    <select id="middleLayer" name="middleLayer" onChange="layerChoice()">
+                        <option value="" selected disabled hidden>Select a layer</option>
+                        <option value="">Your choice is...</option>
+                        <option value="1">Layer 1</option>
+                        <option value="2">Layer 2</option>
+                        <option value="3">Layer 3</option>
+                    </select>
+                    <br>
+                    <label for="bottomLayer">Select bottom layer:</label>
+                    <select id="bottomLayer" name="bottomLayer" onChange="layerChoice()">
+                        <option value="" selected disabled hidden>Select a layer</option>
+                        <option value="">Your choice is...</option>
+                        <option value="1">Layer 1</option>
+                        <option value="2">Layer 2</option>
+                        <option value="3">Layer 3</option>
+                    </select>
+                </form>
+                <div class="mb-3">
+                    <button class="btn btn-success" onclick="saveImage()">Save Image</button>
+                </div>
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label">Upload File</label>
+                    <input type="file" class="form-control-file" id="fileInput">
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <button onclick="undoAction()">Undo</button>
-    <button onclick="redoAction()">Redo</button>
-    <button onclick="resetZoom()">Reset Zoom</button>
+<script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 vPosition;
+    attribute vec4 vColor;
+        
+    varying vec4 fColor;
+        
+    uniform mat4 zoomMatrix;
+        
+    void
+    main()
+    {
+        gl_Position = zoomMatrix * vPosition;
+        fColor = vColor;
+        gl_PointSize = 10.0;
+    }
+    </script>
     
-    <form>
-        <label for="topLayer">Select top layer:</label>
-        <select id="topLayer" name="topLayer" onChange="layerChoice()">
-            <option value="0">Layer 1</option>
-            <option value="1">Layer 2</option>
-            <option value="2">Layer 3</option>
-        </select>
-        <br>
-        <label for="middleLayer">Select middle layer:</label>
-        <select id="middleLayer" name="middleLayer" onChange="layerChoice()">
-            <option value="0">Layer 1</option>
-            <option selected value="1">Layer 2</option>
-            <option value="2">Layer 3</option>
-        </select>
-        <br>
-        <label for="bottomLayer">Select middle layer:</label>
-        <select id="bottomLayer" name="bottomLayer" onChange="layerChoice()">
-            <option value="0">Layer 1</option>
-            <option value="1">Layer 2</option>
-            <option selected value="2">Layer 3</option>
-        </select>
-    </form>
-    <button onclick="saveImage()">Save Image</button>
-    <input type="file" id="fileInput"></input>
-</div>
+    <script id="fragment-shader" type="x-shader/x-fragment">
+    
+    precision mediump float;
+    
+    varying vec4 fColor;
+    
+    void
+    main()
+    {
+        gl_FragColor = fColor;
+    }
+    </script>
+        
+        
+
+    <script type="text/javascript" src="Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="Common/initShaders.js"></script>
+    <script type="text/javascript" src="Common/MV.js"></script>
+    <script type="text/javascript" src="paint.js"></script>
+
+    <!-- Layer selection script -->
+    <script>
+        function layerChoice() {
+            var topLayer = document.getElementById('topLayer');
+            var middleLayer = document.getElementById('middleLayer');
+            var bottomLayer = document.getElementById('bottomLayer');
+            
+            var selectedValues = [
+                topLayer.value,
+                middleLayer.value,
+                bottomLayer.value
+            ];
+
+            // Filter out empty values
+            selectedValues = selectedValues.filter(function(value) {
+                return value !== "";
+            });
+
+            for (var i = 1; i <= 3; i++) {
+                document.querySelectorAll('option[value="' + i + '"]').forEach(function(option) {
+                    option.disabled = selectedValues.includes(option.value) && option.parentElement.value !== option.value;
+                });
+            }
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
+
 </html>

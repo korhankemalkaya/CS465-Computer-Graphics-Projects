@@ -26,10 +26,10 @@ var copiedTriangles = [];  // added this line to store copied triangles
 var copiedColors = [];  // added this line to store copied colors
 var isSelected = false;
 var rectangle_colors = [
-    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
-    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
-    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
-    vec4(1.0, 1.0, 0.0, 1.0),   // yellow
+    vec4(0.0, 0.0, 0.0, 1.0),   // yellow
+    vec4(0.0, 0.0, 0.0, 1.0),   // yellow
+    vec4(0.0, 0.0, 0.0, 1.0),   // yellow
+    vec4(0.0, 0.0, 0.0, 1.0),   // yellow
 ];
 
 var triangles = []
@@ -575,7 +575,7 @@ window.onload = function init() {
 });
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.5, 0.5, 0.5, 1.0);
+    gl.clearColor(1.0, 1.0, 1.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Load shaders and initialize attribute buffers
