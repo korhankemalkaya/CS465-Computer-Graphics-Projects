@@ -42,8 +42,7 @@ var strokeNumber = 0;
 var strokes = [];
 var strokeColors = [];
 
-var redo = [];
-var redoColors = [];
+//var redo = [];
 var redoPossible = false;
 
 //RECTANGULAR SELECTION Related
@@ -69,6 +68,8 @@ var canvasY = +1;
 
 //Layer Related
 var redoLayers = [[] , [] , []];
+var redoColors = [[],[],[]];
+
 var redoPossibleLayers = [false,false,false];
 
 var strokesLayer = [[] , [] , []];
@@ -316,9 +317,8 @@ window.onload = function init() {
                 strokeStartIndex += strokeTriangleNumber;
                 strokeTriangleNumber = 0;
                 strokeNumber++;
-                redo = [];
                 redoLayers[topLayerIndex] = []
-                redoColors = [];
+                redoColors = [[],[],[]];
                 redoPossibleLayers[topLayerIndex] = false;
             }       
         }//When the rectangular area selection tool is active, the user can select a rectangular area by dragging the mouse.
@@ -577,7 +577,7 @@ window.onload = function init() {
 });
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(1.0, 1.0, 1.0, 0.0);
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Load shaders and initialize attribute buffers
@@ -606,69 +606,83 @@ window.onload = function init() {
 }
 
 function redoAction(){
-    if(redoPossible && redo.length > 0){
-        strokeStartIndex += redo[redo.length-1].length;
+    if(redoPossibleLayers[topLayerIndex] && redoLayers[topLayerIndex].length > 0){
+        strokeStartIndex += redoLayers[topLayerIndex][redoLayers[topLayerIndex].length-1].length;
         strokeNumber++;
 
-        var temp = redo.pop();
+        var temp = redoLayers[topLayerIndex].pop();
+        //Handle stroke layers, triangle layers
         strokes.push(temp);
+        strokesLayer[topLayerIndex].push(strokeNumber);
+        
         
         //triangles
         for(let i = 0; i < temp.length; i++){
             triangles.push(temp[i]);
-            //-----------------------------------------------------------------------------------------------------
             triangleLayers[topLayerIndex].push(triangles.length-1);
         }
 
         index += temp.length
 
-        temp = redoColors.pop();
-        strokeColors.push(temp);
-        
+        var tempC = redoColors[topLayerIndex].pop();
+        console.log("this is "+ tempC);
+        console.log(tempC.length);    
         //colorsSaved
-        for(let i = 0; i <temp.length; i++){
-            colorsSaved.push(temp[i]);
+        console.log(tempC.length);
+        for(let i = 0; i <tempC.length; i++){
+            colorsSaved.push(tempC[i]);
         }
+
 
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
                     
-        gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(triangles.flat()) , gl.STATIC_DRAW);
 
-        if (redo.length == 0){
-            redoPossible = false;
+
+        if (redoLayers[topLayerIndex].length == 0){
+            redoPossibleLayers[topLayerIndex] = false;
         }
         render();
     }
 }
 
 function undoAction(){
-    if(strokeNumber > 0){
+    if(strokeNumber > 0 && strokesLayer[topLayerIndex].length > 0){
+        //Should be layer supportive
+        console.log("top layer index is " + topLayerIndex);
+        var tempStrokeIndex = strokesLayer[topLayerIndex].pop();
+        console.log("temp stroke index is " + tempStrokeIndex);
+        redoPossibleLayers[topLayerIndex] = true;
+
         strokeStartIndex -= strokes[strokeNumber-1].length;
         strokeNumber--;
 
-        var temp = strokes.pop();
-        redo.push(temp);
+        var temp = strokes[tempStrokeIndex];
+        strokes.splice(tempStrokeIndex,1);
+        var tempC = strokeColors[tempStrokeIndex];
+        strokeColors.splice(tempStrokeIndex,1);
+
+        redoLayers[topLayerIndex].push(temp);
+        redoColors[topLayerIndex].push(tempC);        
+
         
         //triangles delete
         for(let i = 0; i < temp.length; i++){
-            triangles.pop();
-            //gecici cozum------------------------------------------------------------------------------------------------
-            triangleLayers[topLayerIndex].pop();
+            var tempTriangleIndex = triangleLayers[topLayerIndex].pop(); 
+            triangles.splice(tempTriangleIndex,1);
+            colorsSaved.splice(tempTriangleIndex,1);
         }
 
+        for(var t = 0; t < 3; t++){
+            for(var z = 0; z < strokesLayer[t].length; z++){
+                if(strokesLayer[t][z] > tempStrokeIndex){
+                    strokesLayer[t][z] = strokesLayer[t][z] - 1;
+                } 
+            }
+        }
+        console.log("After undo: "+ triangles.length);
         index -= temp.length
-
-        temp = strokeColors.pop();
-        redoColors.push(temp);
         
-        //triangleColorsDelete
-        for(let i = 0; i < temp.length; i++){
-            colorsSaved.pop();
-        }
-
-        redoPossible = true;
 
         gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
         gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsSaved.flat()) , gl.STATIC_DRAW);
@@ -840,6 +854,8 @@ function layerChoice(){
             }
         }
     
+        console.log(triangles.length);
+        console.log(tempTriangles.length);
         triangles = tempTriangles;
         triangleLayers = tempTriangleLayers;
         colorsSaved = tempColors;
@@ -952,6 +968,7 @@ function loadImage(event) {
    };
    reader.readAsText(file); // Read the file as text
 }
+
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
