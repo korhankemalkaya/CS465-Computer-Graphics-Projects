@@ -26,15 +26,15 @@ var torsoId = 0;
 var legs = [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18],[19,20,21],[22,23,24]];
 
 
-var torsoHeight = 5.0;
-var torsoWidth = 3.0;
+var torsoHeight = 6.0;
+var torsoWidth = 5.0;
 
 var upperLegHeight = 3.0;
-var middleLegHeight = 2.5;
-var lowerLegHeight = 1.5;
-var upperLegWidth  = 0.75;
-var middleLegWidth = 0.5;
-var lowerLegWidth  = 0.25;
+var middleLegHeight = 3.0;
+var lowerLegHeight = 3.0;
+var upperLegWidth  = 0.8;
+var middleLegWidth = 0.6;
+var lowerLegWidth  = 0.4;
 
 var numNodes = 25;
 var numAngles = 25;
@@ -98,50 +98,50 @@ function initNodes(Id) {
 
     //Upper Arm
     case legs[0][0]://on sol
-        m = translate(-(torsoWidth+upperLegWidth), 0.9*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[0][0]], 1, 0, 0));
+        m = translate(-(torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
+	    m = mult(m , rotate(theta[legs[0][0]], 1, 0, 1));
         figure[legs[0][0]] = createNode( m, upperLeg, legs[1][0], legs[0][1]);
         break;
 
     case legs[1][0]://on orta
-        m = translate(-(upperLegWidth/2), 0.9*upperLegHeight, 0.0);
+        m = translate(0, (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[1][0]], 1, 0, 0));
         figure[legs[1][0]] = createNode( m, upperLeg, legs[2][0], legs[1][1] );
         break;
 
     case legs[2][0]://on sag
-        m = translate((torsoWidth+upperLegWidth), 0.9*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[2][0]], 1, 0, 0));
+        m = translate((torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
+	    m = mult(m , rotate(theta[legs[2][0]], 1, 0, 1));
         figure[legs[2][0]] = createNode( m, upperLeg, legs[3][0], legs[2][1] );
         break;
 
     case legs[3][0]://orta sol
-        m = translate(-(torsoWidth+upperLegWidth), 0.5*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[3][0]], 1, 0, 0));
+        m = translate(-(torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), 0.0);
+	    m = mult(m , rotate(theta[legs[3][0]], 0, 0, 1));
         figure[legs[3][0]] = createNode( m, upperLeg, legs[4][0], legs[3][1] );
         break;
 
     case legs[4][0]://orta sag
-        m = translate((torsoWidth+upperLegWidth), 0.5*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[4][0]], 1, 0, 0));
+        m = translate((torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), 0.0);
+	    m = mult(m , rotate(theta[legs[4][0]], 0, 0, 1));
         figure[legs[4][0]] = createNode( m, upperLeg, legs[5][0], legs[4][1] );
         break;
 
     case legs[5][0]://arka sol
-        m = translate(-(torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[5][0]], 1, 0, 0));
+        m = translate(-(torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
+	    m = mult(m , rotate(theta[legs[5][0]], 1, 0, 1));
         figure[legs[5][0]] = createNode( m, upperLeg, legs[6][0], legs[5][1] );
         break;
 
     case legs[6][0]://arka orta
-        m = translate(-(upperLegWidth/2), 0.1*upperLegHeight, 0.0);
+        m = translate(0, (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[6][0]], 1, 0, 0));
         figure[legs[6][0]] = createNode( m, upperLeg, legs[7][0], legs[6][1] );
         break;
 
     case legs[7][0]://arka sag
-        m = translate((torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-	    m = mult(m , rotate(theta[legs[7][0]], 1, 0, 0));
+        m = translate((torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
+	    m = mult(m , rotate(theta[legs[7][0]], 1, 0, 1));
         figure[legs[7][0]] = createNode( m, upperLeg, null, legs[7][1] );
         break;
 
@@ -197,49 +197,49 @@ function initNodes(Id) {
 
     //Lower Arm
     case legs[0][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[0][2]], 1, 0, 0));
         figure[legs[0][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[1][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[1][2]], 1, 0, 0));
         figure[legs[1][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[2][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[2][2]], 1, 0, 0));
         figure[legs[2][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[3][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[3][2]], 1, 0, 0));
         figure[legs[3][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[4][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[4][2]], 1, 0, 0));
         figure[legs[4][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[5][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[5][2]], 1, 0, 0));
         figure[legs[5][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[6][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[6][2]], 1, 0, 0));
         figure[legs[6][2]] = createNode( m, lowerLeg, null, null );
         break;
 
     case legs[7][2]:
-        m = translate(0.0, upperLegHeight+middleLegHeight, 0.0);
+        m = translate(0.0, middleLegHeight, 0.0);
         m = mult(m, rotate(theta[legs[7][2]], 1, 0, 0));
         figure[legs[7][2]] = createNode( m, lowerLeg, null, null );
         break;
