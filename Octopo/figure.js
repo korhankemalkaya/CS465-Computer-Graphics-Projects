@@ -42,7 +42,7 @@ var middleLegWidth = 0.6;
 var lowerLegWidth  = 0.4;
 
 var numNodes = 25;
-var numAngles = 25;
+var numAngles = 25; // should it be 26?
 var angle = 0;
 
 var theta = [0,
@@ -65,6 +65,18 @@ var vBuffer;
 var modelViewLoc;
 
 var pointsArray = [];
+var normalsArray = [];
+
+var lightPosition = vec4(0.0, 1.0, 1.0, 0.0 );
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+var materialAmbient = vec4( 0.0, 0.0, 1.0, 1.0 );
+var materialDiffuse = vec4( 0.6, 0.0, 0.4, 1.0);
+var materialSpecular = vec4( 0.6, 0.0, 0.4, 1.0 );
+var materialShininess = 100.0;
+
 
 function degreeToRadians(degreeVar){
     return degreeVar * Math.PI / 180;
@@ -288,35 +300,49 @@ function torso(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5*torsoHeight, 0.0) );
     instanceMatrix = mult(instanceMatrix, scale4( torsoWidth, torsoHeight, torsoWidth));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
 }
 
 function upperLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * upperLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(upperLegWidth, upperLegHeight, upperLegWidth) );
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
 }
 
 function middleLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * middleLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(middleLegWidth, middleLegHeight, middleLegWidth) )
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
 }
 
 function lowerLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * lowerLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(lowerLegWidth, lowerLegHeight, lowerLegWidth) )
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
 }
 
 function quad(a, b, c, d){
-    pointsArray.push(vertices[a]); 
-    pointsArray.push(vertices[b]); 
-    pointsArray.push(vertices[c]);     
-    pointsArray.push(vertices[d]);    
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    var normal = vec3(normal);
+
+
+    pointsArray.push(vertices[a]);
+    normalsArray.push(normal);
+    pointsArray.push(vertices[b]);
+    normalsArray.push(normal);
+    pointsArray.push(vertices[c]);
+    normalsArray.push(normal);
+    pointsArray.push(vertices[a]);
+    normalsArray.push(normal);
+    pointsArray.push(vertices[c]);
+    normalsArray.push(normal);
+    pointsArray.push(vertices[d]);
+    normalsArray.push(normal);
 }
 
 
@@ -338,37 +364,59 @@ window.onload = function init(){
     if ( !gl ) { alert( "WebGL isn't available" ); }
     
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.clearColor( 219/255, 255/255, 254/255, 1.0 );
     
+    gl.enable(gl.DEPTH_TEST);
+
     //
     //  Load shaders and initialize attribute buffers
     //
     program = initShaders( gl, "vertex-shader", "fragment-shader");
     
     gl.useProgram( program);
+    cube();
 
-    instanceMatrix = mat4();
-    
+    var nBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW );
+
+    var vNormal = gl.getAttribLocation( program, "vNormal" );
+    gl.vertexAttribPointer( vNormal, 3, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
+
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
+
     projectionMatrix = ortho(-10.0,10.0,-10.0, 10.0,-10.0,10.0);
+    instanceMatrix = mat4();
     modelViewMatrix = mat4();
-        
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
+
+    ambientProduct = mult(lightAmbient, materialAmbient);
+    diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    specularProduct = mult(lightSpecular, materialSpecular);
+
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
+        flatten(ambientProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
+        flatten(diffuseProduct) );
+    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
+        flatten(specularProduct) );
+    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"),
+        flatten(lightPosition) );
+
+    gl.uniform1f(gl.getUniformLocation(program,
+        "shininess"),materialShininess);
+
     gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
     gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
     
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-    cameraMatrixLoc = gl.getUniformLocation( program, "cameraMatrix" );
-    
-    cube();
-        
-    vBuffer = gl.createBuffer();
-        
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
-    
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
-    
+  
     document.getElementById("slider0").onchange = function() {
         theta[torsoId ] = event.srcElement.value;
         initNodes(torsoId);
