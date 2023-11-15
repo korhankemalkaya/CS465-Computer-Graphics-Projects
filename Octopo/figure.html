@@ -7,10 +7,11 @@ attribute  vec4 vPosition;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 cameraMatrix;
 
 void main() 
 {
-    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrix;
 } 
 </script>
 
@@ -21,7 +22,6 @@ precision mediump float;
 void main()
 {
     gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-
 }
 </script>
 
@@ -33,167 +33,138 @@ void main()
 <script type="text/javascript" src="figure.js"></script>
 
 <div id="slider0">
-torso angle -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    torso angle -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
 
 <div id="slider1">
-Front Left Upper -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="-180"
-  />
- 180
+    Front Left Upper -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
 
 <div id="slider2">
-Front Left Middle -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Left Middle -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider3">
-Front Left Lower -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Left Lower -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider4">
-Front Middle Upper -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="-180"
-  />
- 180
+    Front Middle Upper -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
+
 <div id="slider5">
-Front Middle Middle -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Middle Middle -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider6">
-Front Middle Lower -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Middle Lower -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider7">
-Front Right Upper -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="-180"
-  />
- 180
+    Front Right Upper -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
+
 <div id="slider8">
-Front Right Middle -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Right Middle -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
 
 <div id="slider9">
-Front Right Lower -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Front Right Lower -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
 
 <div id="slider10">
     Middle Left Upper -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="-180"
-      />
-     180
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
 
 <div id="slider11">
     Middle Left Middle -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
 
 <div id="slider12">
-Middle Left Lower -180 <input id="slide" type="range"
- min="-180" max="180" step="10" value="0"
-  />
- 180
+    Middle Left Lower -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
 
 <div id="slider13">
     Middle Right Upper -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="-180"
-      />
-     180
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
 
 <div id="slider14">
     Middle Right Middle -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider15">
     Middle Right Lower -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider16">
     Back Left Upper -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="-180"
-      />
-     180
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
+
 <div id="slider17">
     Back Left Middle -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider18">
     Back Left Lower -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
+
 <div id="slider19">
     Back Middle Upper -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="-180"
-      />
-     180
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
     
 <div id="slider20">
     Back Middle Middle -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
     
 <div id="slider21">
     Back Middle Lower -180 <input id="slide" type="range"
-         min="-180" max="180" step="10" value="0"
-          />
-         180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
     
 <div id="slider22">
     Back Right Upper -180 <input id="slide" type="range"
-         min="-180" max="180" step="10" value="-180"
-          />
-         180
+    min="-180" max="180" step="10" value="-180"/>180
 </div><br/>
     
 <div id="slider23">
     Back Right Middle -180 <input id="slide" type="range"
-     min="-180" max="180" step="10" value="0"
-      />
-     180
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
     
 <div id="slider24">
     Back Right Lower -180 <input id="slide" type="range"
-         min="-180" max="180" step="10" value="0"
-          />
-         180
+    min="-180" max="180" step="10" value="0"/>180
+</div><br/>
+
+<div id="slider25">
+    Rotate Camera Y -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
+</div><br/>
+
+<div id="slider26">
+    Rotate Camera x -180 <input id="slide" type="range"
+    min="-180" max="180" step="10" value="0"/>180
 </div><br/>
     
 <body>

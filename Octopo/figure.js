@@ -4,13 +4,19 @@ var program;
 
 var projectionMatrix; 
 var modelViewMatrix;
-
 var instanceMatrix;
 
 var modelViewMatrixLoc;
 
-var vertices = [
+var cameraMatrix = [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1
+];
+var cameraMatrixLoc;
 
+var vertices = [
     vec4( -0.5, -0.5,  0.5, 1.0 ),
     vec4( -0.5,  0.5,  0.5, 1.0 ),
     vec4( 0.5,  0.5,  0.5, 1.0 ),
@@ -21,10 +27,8 @@ var vertices = [
     vec4( 0.5, -0.5, -0.5, 1.0 )
 ];
 
-
 var torsoId = 0;
 var legs = [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18],[19,20,21],[22,23,24]];
-
 
 var torsoHeight = 6.0;
 var torsoWidth = 5.0;
@@ -32,6 +36,7 @@ var torsoWidth = 5.0;
 var upperLegHeight = 3.0;
 var middleLegHeight = 3.0;
 var lowerLegHeight = 3.0;
+
 var upperLegWidth  = 0.8;
 var middleLegWidth = 0.6;
 var lowerLegWidth  = 0.4;
@@ -61,18 +66,41 @@ var modelViewLoc;
 
 var pointsArray = [];
 
-//-------------------------------------------
-
-function scale4(a, b, c) {
-   var result = mat4();
-   result[0][0] = a;
-   result[1][1] = b;
-   result[2][2] = c;
-   return result;
+function degreeToRadians(degreeVar){
+    return degreeVar * Math.PI / 180;
 }
 
-//--------------------------------------------
+function rotateY(angleVar){
+    var cosVar = Math.cos(angleVar);
+    var sinVar = Math.sin(angleVar);
 
+    cameraMatrix[0] = cosVar;
+    cameraMatrix[2] = -sinVar;
+    cameraMatrix[8] = sinVar;
+    cameraMatrix[10] = cosVar;
+
+    render();
+}
+
+function rotateX(angleVar){
+    var cosVar = Math.cos(angleVar);
+    var sinVar = Math.sin(angleVar);
+
+    cameraMatrix[5] = cosVar;
+    cameraMatrix[6] = sinVar;
+    cameraMatrix[9] = -sinVar;
+    cameraMatrix[10] = cosVar;
+
+    render();
+}
+
+function scale4(a, b, c){
+    var result = mat4();
+    result[0][0] = a;
+    result[1][1] = b;
+    result[2][2] = c;
+    return result;
+}
 
 function createNode(transform, render, sibling, child){
     var node = {
@@ -85,8 +113,7 @@ function createNode(transform, render, sibling, child){
 }
 
 
-function initNodes(Id) {
-
+function initNodes(Id){
     var m = mat4();
     
     switch(Id) {
@@ -247,17 +274,17 @@ function initNodes(Id) {
 
 }
 
-function traverse(Id) {
-   if(Id == null) return; 
-   stack.push(modelViewMatrix);
-   modelViewMatrix = mult(modelViewMatrix, figure[Id].transform);
-   figure[Id].render();
-   if(figure[Id].child != null) traverse(figure[Id].child); 
+function traverse(Id){
+    if(Id == null) return; 
+    stack.push(modelViewMatrix);
+    modelViewMatrix = mult(modelViewMatrix, figure[Id].transform);
+    figure[Id].render();
+    if(figure[Id].child != null) traverse(figure[Id].child); 
     modelViewMatrix = stack.pop();
-   if(figure[Id].sibling != null) traverse(figure[Id].sibling); 
+    if(figure[Id].sibling != null) traverse(figure[Id].sibling); 
 }
 
-function torso() {
+function torso(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5*torsoHeight, 0.0) );
     instanceMatrix = mult(instanceMatrix, scale4( torsoWidth, torsoHeight, torsoWidth));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
@@ -285,16 +312,15 @@ function lowerLeg(){
     for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
 }
 
-function quad(a, b, c, d) {
-     pointsArray.push(vertices[a]); 
-     pointsArray.push(vertices[b]); 
-     pointsArray.push(vertices[c]);     
-     pointsArray.push(vertices[d]);    
+function quad(a, b, c, d){
+    pointsArray.push(vertices[a]); 
+    pointsArray.push(vertices[b]); 
+    pointsArray.push(vertices[c]);     
+    pointsArray.push(vertices[d]);    
 }
 
 
-function cube()
-{
+function cube(){
     quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
@@ -304,7 +330,7 @@ function cube()
 }
 
 
-window.onload = function init() {
+window.onload = function init(){
 
     canvas = document.getElementById( "gl-canvas" );
     
@@ -325,12 +351,12 @@ window.onload = function init() {
     
     projectionMatrix = ortho(-10.0,10.0,-10.0, 10.0,-10.0,10.0);
     modelViewMatrix = mat4();
-
         
     gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
     gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
     
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+    cameraMatrixLoc = gl.getUniformLocation( program, "cameraMatrix" );
     
     cube();
         
@@ -343,17 +369,17 @@ window.onload = function init() {
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
     
-        document.getElementById("slider0").onchange = function() {
+    document.getElementById("slider0").onchange = function() {
         theta[torsoId ] = event.srcElement.value;
         initNodes(torsoId);
     };
     document.getElementById("slider1").onchange = function() {
-         theta[legs[0][0]] = event.srcElement.value;
-         initNodes(legs[0][0]);
+        theta[legs[0][0]] = event.srcElement.value;
+        initNodes(legs[0][0]);
     };
     document.getElementById("slider2").onchange = function() {
-         theta[legs[0][1]] =  event.srcElement.value;
-         initNodes(legs[0][1]);
+        theta[legs[0][1]] =  event.srcElement.value;
+        initNodes(legs[0][1]);
     };
     document.getElementById("slider3").onchange = function() {
         theta[legs[0][2]] =  event.srcElement.value;
@@ -380,8 +406,8 @@ window.onload = function init() {
         initNodes(legs[2][1]);
     };
     document.getElementById("slider9").onchange = function() {
-       theta[legs[2][2]] =  event.srcElement.value;
-       initNodes(legs[2][2]);
+        theta[legs[2][2]] =  event.srcElement.value;
+        initNodes(legs[2][2]);
     };
     document.getElementById("slider10").onchange = function() {
         theta[legs[3][0]] = event.srcElement.value;
@@ -392,8 +418,8 @@ window.onload = function init() {
         initNodes(legs[3][1]);
     };
     document.getElementById("slider12").onchange = function() {
-       theta[legs[3][2]] =  event.srcElement.value;
-       initNodes(legs[3][2]);
+        theta[legs[3][2]] =  event.srcElement.value;
+        initNodes(legs[3][2]);
     };
     document.getElementById("slider13").onchange = function() {
         theta[legs[4][0]] = event.srcElement.value;
@@ -404,8 +430,8 @@ window.onload = function init() {
         initNodes(legs[4][1]);
     };
     document.getElementById("slider15").onchange = function() {
-       theta[legs[4][2]] =  event.srcElement.value;
-       initNodes(legs[4][2]);
+        theta[legs[4][2]] =  event.srcElement.value;
+        initNodes(legs[4][2]);
     };
     document.getElementById("slider16").onchange = function() {
         theta[legs[5][0]] = event.srcElement.value;
@@ -416,8 +442,8 @@ window.onload = function init() {
         initNodes(legs[5][1]);
     };
     document.getElementById("slider18").onchange = function() {
-       theta[legs[5][2]] =  event.srcElement.value;
-       initNodes(legs[5][2]);
+        theta[legs[5][2]] =  event.srcElement.value;
+        initNodes(legs[5][2]);
     };
     document.getElementById("slider19").onchange = function() {
         theta[legs[6][0]] = event.srcElement.value;
@@ -428,8 +454,8 @@ window.onload = function init() {
         initNodes(legs[6][1]);
     };
     document.getElementById("slider21").onchange = function() {
-       theta[legs[6][2]] =  event.srcElement.value;
-       initNodes(legs[6][2]);
+        theta[legs[6][2]] =  event.srcElement.value;
+        initNodes(legs[6][2]);
     };
     document.getElementById("slider22").onchange = function() {
         theta[legs[7][0]] = event.srcElement.value;
@@ -440,19 +466,26 @@ window.onload = function init() {
         initNodes(legs[7][1]);
     };
     document.getElementById("slider24").onchange = function() {
-       theta[legs[7][2]] =  event.srcElement.value;
-       initNodes(legs[7][2]);
+        theta[legs[7][2]] =  event.srcElement.value;
+        initNodes(legs[7][2]);
+    };
+    document.getElementById("slider25").onchange = function() {
+        radianDeg =  degreeToRadians(event.srcElement.value);
+        rotateY(radianDeg);
+    };
+    document.getElementById("slider26").onchange = function() {
+        radianDeg =  degreeToRadians(event.srcElement.value);
+        rotateX(radianDeg);
     };
 
     for(i=0; i<numNodes; i++) initNodes(i);
-    
     render();
 }
 
 
 var render = function() {
-
-        gl.clear( gl.COLOR_BUFFER_BIT );
-        traverse(torsoId);
-        requestAnimFrame(render);
+    gl.clear( gl.COLOR_BUFFER_BIT );
+    gl.uniformMatrix4fv( cameraMatrixLoc, false, flatten(cameraMatrix));
+    traverse(torsoId);
+    requestAnimFrame(render);
 }
