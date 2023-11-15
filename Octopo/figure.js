@@ -1,3 +1,5 @@
+var delay = 0;
+
 var canvas;
 var gl;
 var program;
@@ -50,8 +52,6 @@ var middleLegWidth = 0.6;
 var lowerLegWidth  = 0.4;
 
 var numNodes = 25;
-var numAngles = 25; // should it be 26?
-var angle = 0;
 
 var theta = [0,
     -180, 0, 0,
@@ -62,6 +62,22 @@ var theta = [0,
     -180, 0, 0,
     -180, 0, 0,
     -180, 0, 0];
+
+var thetaArr = [[0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0]] //Check if it is necessary
+
+//TODO: CHECK IF SLIDER CASE MATH NECESSARY
+//Animation Variables
+var animFrameCounter = 0;
+var animFrameLen = thetaArr.length - 1;
+var animToggle = false;
 
 var stack = [];
 
@@ -75,15 +91,15 @@ var modelViewLoc;
 var pointsArray = [];
 var normalsArray = [];
 
-var lightPosition = vec4(0.0, 1.0, 1.0, 0.0 );
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
+var lightPosition = vec4(1.0, 0.0, 1.0, 0.0 );
+var lightAmbient = vec4(0.3, 0.1, 0.3, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
 var materialAmbient = vec4( 0.0, 0.0, 1.0, 1.0 );
 var materialDiffuse = vec4( 0.6, 0.0, 0.4, 1.0);
 var materialSpecular = vec4( 0.6, 0.0, 0.4, 1.0 );
-var materialShininess = 100.0;
+var materialShininess = 80.0;
 
 
 function degreeToRadians(degreeVar){
@@ -372,7 +388,7 @@ window.onload = function init(){
     if ( !gl ) { alert( "WebGL isn't available" ); }
     
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 219/255, 255/255, 254/255, 1.0 );
+    gl.clearColor( 219/255, 240/255, 254/255, 1.0 );
     
     gl.enable(gl.DEPTH_TEST);
 
@@ -535,16 +551,185 @@ window.onload = function init(){
         radianDeg =  degreeToRadians(event.srcElement.value);
         rotateX(radianDeg);
     };
+    //TODO: NEUTRAL POSE IMPLEMENTATION
+    /*document.getElementById("NeutralPose").onclick = function(){
+        theta[torsoId] = 0;
+        theta[legs[0][0]] = -180;
+        theta[legs[0][1]] = -180;
+        theta[legs[0][2]] = -180;
+        theta[legs[1][0]] = -180;
+        theta[legs[1][1]] = -180;
+        theta[legs[1][2]] = -180;
+        theta[legs[2][0]] = -180;
+        theta[legs[2][1]] = -180;
+        theta[legs[2][2]] = -180;
+        theta[legs[3][0]] = -180;
+        theta[legs[3][1]] = -180;
+        theta[legs[3][2]] = -180;
+        theta[legs[4][0]] = -180;
+        theta[legs[4][1]] = -180;
+        theta[legs[4][2]] = -180;
+        theta[legs[5][0]] = -180;
+        theta[legs[5][1]] = -180;
+        theta[legs[5][2]] = -180;
+        theta[legs[6][0]] = -180;
+        theta[legs[6][1]] = -180;
+        theta[legs[6][2]] = -180;
+        theta[legs[7][0]] = -180;
+        theta[legs[7][1]] = -180;
+        theta[legs[7][2]] = -180;
+        initNodes(torsoId);
+    };*/
+    // Code segment for uploading JSON config.
+// This is the event listener for the save button
+    var saveButton = document.getElementById('savebutton'); // Make sure this is the correct ID for your save button
+    saveButton.addEventListener("click", function() {
+        try {
+            // Call the interpolate method and ensure it returns a value
+            var interpolatedThetaArr = interpolate(thetaArr);
+            if (!interpolatedThetaArr) {
+                throw new Error('Interpolation function returned no value.');
+            }
+
+            // Construct the JSON configuration object
+            var config = {
+                thetaArr: interpolatedThetaArr
+            };
+
+            // Convert the JSON object to a data URI
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
+
+            // Create an anchor element if it doesn't exist
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            if (!dlAnchorElem) {
+                dlAnchorElem = document.createElement('a');
+                document.body.appendChild(dlAnchorElem);
+            }
+
+            // Set the href and download attributes for the anchor element
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "config.json");
+
+            // Trigger the download
+            dlAnchorElem.click();
+
+            // Clear the thetaArr if necessary
+            thetaArr = [];
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });    
+    //It saves the current frame to the thetaArr so that it can be interpolated later.
+    var saveFrameButton = document.getElementById("saveframebutton");
+    saveFrameButton.addEventListener("click", function(){
+        thetaArr.push(theta);
+    }
+    );
+
+
+
+    var uploadInput = document.getElementById("uploadconfig");
+    var uploadButton = document.getElementById("uploadbutton");
+    var animateButton = document.getElementById("animatebutton");
+    var uploadMsg = document.getElementById("uploadmsg");
+    uploadButton.addEventListener("click", function(){
+        var file = uploadInput.files[0];
+        if(file){
+            var reader = new FileReader(); // File reader to read the file
+            var providedArr;
+            reader.addEventListener('load', function() {
+                var result = JSON.parse(reader.result); // Parse the result into an object
+
+                providedArr = result.thetaArr;
+
+                if(providedArr){
+                    thetaArr = providedArr;
+                    animFrameLen = thetaArr.length -1;
+                    animFrameCounter = 0;
+                    uploadMsg.style.display = "none";
+                } else {
+                    uploadMsg.innerText = "This is not a suitable config!";
+                    uploadMsg.style.display = "block";
+                }
+            });
+            reader.readAsText(file);
+        } else {
+            uploadMsg.innerText = "No file has been provided!";
+            uploadMsg.style.display = "block";
+        }
+    });
+
+    document.getElementById("framedelay").onchange = function() {
+        delay = this.value;
+    };
+
+    animateButton.addEventListener("click", function(){
+        animToggle = !animToggle;
+    });
 
     for(i=0; i<numNodes; i++) initNodes(i);
     render();
 }
 
+    
 
-var render = function() {
-    gl.clear( gl.COLOR_BUFFER_BIT );
+
+var render = async function() {
+    if (animToggle) {
+        await new Promise(r => setTimeout(r, delay));
+        run_anim();
+    }
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
     gl.uniformMatrix4fv( cameraMatrixLocY, false, flatten(cameraMatrixY));
     gl.uniformMatrix4fv( cameraMatrixLocX, false, flatten(cameraMatrixX));
     traverse(torsoId);
     requestAnimFrame(render);
 }
+
+function run_anim(){
+    animFrameCounter++;
+    if(animFrameCounter > animFrameLen)
+        animFrameCounter = 0
+    theta = thetaArr[animFrameCounter];
+    for(i=0; i<numNodes; i++) initNodes(i);
+}
+//Interpolation function
+function interpolate( currArr) {
+    var interpolatedArr = [];
+    var len = currArr.length;
+    for (var i = 0; i < len - 1; i++) {
+        interpolatedArr.push(currArr[i]);
+        var curr = currArr[i];
+        var next = currArr[i + 1];
+        var diff = [];
+        for (var j = 0; j < curr.length; j++) {
+            diff.push((next[j] - curr[j]) / 10);
+        }
+        for (var k = 0; k < 9; k++) {
+            var temp = [];
+            for (var l = 0; l < curr.length; l++) {
+                //if (curr[l] + diff[l] * (k + 1) <= 180 && curr[l] + diff[l] * (k + 1) >= -180)
+                    temp.push(curr[l] + diff[l] * (k + 1));
+                //else if (curr[l] + diff[l] * (k + 1) > 180) {
+                 //   temp.push(180);
+                //}
+                //else if (curr[l] + diff[l] * (k + 1) < -180) {
+                 //   temp.push(-180);
+               // }
+            }
+            interpolatedArr.push(temp);
+        }
+    }
+    interpolatedArr.push(currArr[len - 1]);
+    return interpolatedArr;
+}
+
+//TODO:
+//KAFADAKI GOCUK-- QUAD fonksiyonu alakalı 
+//Silindir yapisi, tipi duzeltme
+// Iki tane animasyon butonu
+// Interpolation problemi
+// UI - arkaya deniz koymayi denesene
+// Neutral pose butonu
+// Constraints on legs. Yani bacaklar kafayi dönüyor falan
+

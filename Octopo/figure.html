@@ -182,13 +182,22 @@
                     <label for="rotateCameraXSlider">Rotate Camera X</label>
                     <input type="range" class="custom-range" id="slider26" min="-180" max="180" step="10" value="0">
                 </div>
-
-                                <!-- Action Buttons -->
-                                <button class="btn btn-primary btn-block mt-4">Save</button>
-                                <button class="btn btn-secondary btn-block">Reset</button>
-                            </div>
+                <div class="upload">
+                    <p class="filedesc">Import Animation</p><br>
+                    <input type="file" accept="application/JSON" id="uploadconfig">
+                    <button id="uploadbutton">Upload Animation</button>
+                    <span id="uploadmsg" style="display:none">Error.</span>
+                    <button id="animatebutton">Run/Stop Animation</button>
+                    <p class="filedesc" style="justify-content: left">Animation Speed</p><br>
+                    <input id="framedelay" type="range" min="0" max="1000" step="20" value="0" style="width:100%;">
+                </div>
+                <div class="download">
+                    <button id="savebutton">Save Animation</button>
+                    <button id="saveframebutton">Save Current Frame</button>
+                </div>
                         </div>
                     </div>
+                </div>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
     attribute  vec4 vPosition;
