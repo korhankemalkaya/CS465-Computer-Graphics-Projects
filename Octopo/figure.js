@@ -8,13 +8,21 @@ var instanceMatrix;
 
 var modelViewMatrixLoc;
 
-var cameraMatrix = [
+var cameraMatrixY = [
     1,0,0,0,
     0,1,0,0,
     0,0,1,0,
     0,0,0,1
 ];
-var cameraMatrixLoc;
+var cameraMatrixLocY;
+
+var cameraMatrixX = [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1
+];
+var cameraMatrixLocX;
 
 var vertices = [
     vec4( -0.5, -0.5,  0.5, 1.0 ),
@@ -86,24 +94,24 @@ function rotateY(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
 
-    cameraMatrix[0] = cosVar;
-    cameraMatrix[2] = -sinVar;
-    cameraMatrix[8] = sinVar;
-    cameraMatrix[10] = cosVar;
+    cameraMatrixY[0] = cosVar;
+    cameraMatrixY[2] = -sinVar;
+    cameraMatrixY[8] = sinVar;
+    cameraMatrixY[10] = cosVar;
 
-    render();
+    //render();
 }
 
 function rotateX(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
 
-    cameraMatrix[5] = cosVar;
-    cameraMatrix[6] = sinVar;
-    cameraMatrix[9] = -sinVar;
-    cameraMatrix[10] = cosVar;
+    cameraMatrixX[5] = cosVar;
+    cameraMatrixX[6] = sinVar;
+    cameraMatrixX[9] = -sinVar;
+    cameraMatrixX[10] = cosVar;
 
-    render();
+   // render();
 }
 
 function scale4(a, b, c){
@@ -136,19 +144,19 @@ function initNodes(Id){
         break;
 
     //Upper Arm
-    case legs[0][0]://on sol
+    case legs[0][0]://arka sol
         m = translate(-(torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
-	    m = mult(m , rotate(theta[legs[0][0]], 1, 0, 1));
+	    m = mult(m , rotate(theta[legs[0][0]], 1, 0, -1));
         figure[legs[0][0]] = createNode( m, upperLeg, legs[1][0], legs[0][1]);
         break;
 
-    case legs[1][0]://on orta
+    case legs[1][0]://arka orta
         m = translate(0, (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[1][0]], 1, 0, 0));
         figure[legs[1][0]] = createNode( m, upperLeg, legs[2][0], legs[1][1] );
         break;
 
-    case legs[2][0]://on sag
+    case legs[2][0]://arka sag
         m = translate((torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), -torsoWidth/2+upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[2][0]], 1, 0, 1));
         figure[legs[2][0]] = createNode( m, upperLeg, legs[3][0], legs[2][1] );
@@ -166,21 +174,21 @@ function initNodes(Id){
         figure[legs[4][0]] = createNode( m, upperLeg, legs[5][0], legs[4][1] );
         break;
 
-    case legs[5][0]://arka sol
+    case legs[5][0]://on sol
         m = translate(-(torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[5][0]], 1, 0, 1));
         figure[legs[5][0]] = createNode( m, upperLeg, legs[6][0], legs[5][1] );
         break;
 
-    case legs[6][0]://arka orta
+    case legs[6][0]://on orta
         m = translate(0, (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
 	    m = mult(m , rotate(theta[legs[6][0]], 1, 0, 0));
         figure[legs[6][0]] = createNode( m, upperLeg, legs[7][0], legs[6][1] );
         break;
 
-    case legs[7][0]://arka sag
+    case legs[7][0]://on sag
         m = translate((torsoWidth/2-upperLegWidth/2), (torsoHeight/2-upperLegHeight), torsoWidth/2-upperLegWidth/2);
-	    m = mult(m , rotate(theta[legs[7][0]], 1, 0, 1));
+	    m = mult(m , rotate(theta[legs[7][0]], 1, 0, -1));
         figure[legs[7][0]] = createNode( m, upperLeg, null, legs[7][1] );
         break;
 
@@ -395,7 +403,10 @@ window.onload = function init(){
     projectionMatrix = ortho(-10.0,10.0,-10.0, 10.0,-10.0,10.0);
     instanceMatrix = mat4();
     modelViewMatrix = mat4();
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+    cameraMatrixLocY = gl.getUniformLocation( program, "cameraMatrixY" );
+    cameraMatrixLocX = gl.getUniformLocation( program, "cameraMatrixX" );
+
 
     ambientProduct = mult(lightAmbient, materialAmbient);
     diffuseProduct = mult(lightDiffuse, materialDiffuse);
@@ -415,7 +426,6 @@ window.onload = function init(){
 
     gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
     gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
-    
   
     document.getElementById("slider0").onchange = function() {
         theta[torsoId ] = event.srcElement.value;
@@ -533,7 +543,8 @@ window.onload = function init(){
 
 var render = function() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.uniformMatrix4fv( cameraMatrixLoc, false, flatten(cameraMatrix));
+    gl.uniformMatrix4fv( cameraMatrixLocY, false, flatten(cameraMatrixY));
+    gl.uniformMatrix4fv( cameraMatrixLocX, false, flatten(cameraMatrixX));
     traverse(torsoId);
     requestAnimFrame(render);
 }

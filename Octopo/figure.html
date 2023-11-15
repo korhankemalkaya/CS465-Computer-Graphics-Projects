@@ -1,5 +1,194 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Octopus Model</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for additional styling if needed -->
+    <style>
+        body {
+            background-color: #f7f7f7;
+        }
+        .canvas-container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .slider-container {
+            margin: 20px 0;
+        }
+        .slider-container input {
+            width: 100%;
+        }
+        .slider-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        /* Add more custom styles if needed */
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <!-- Canvas Column -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="gl-canvas" width="1200" height="1200">
+                            WebGL is not available.
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Sliders Column -->
+            <div class="col-md-4">
+                <h2>Controls</h2>
+                <!-- Slider Group -->
+                <div class="form-group">
+                    <label for="torsoSlider">Torso Angle</label>
+                    <input type="range" class="custom-range" id="slider0" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backLeftUpperSlider">Back Left Upper</label>
+                    <input type="range" class="custom-range" id="slider1" min="-180" max="180" step="10" value="-180">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backLeftMiddleSlider">Back Left Middle</label>
+                    <input type="range" class="custom-range" id="slider2" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backLeftLowerSlider">Back Left Lower</label>
+                    <input type="range" class="custom-range" id="slider3" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backMiddleUpperSlider">Back Middle Upper</label>
+                    <input type="range" class="custom-range" id="slider4" min="-180" max="180" step="10" value="-180">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backMiddleMiddleSlider">Back Middle Middle</label>
+                    <input type="range" class="custom-range" id="slider5" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backMiddleLowerSlider">Back Middle Lower</label>
+                    <input type="range" class="custom-range" id="slider6" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backRightUpperSlider">Back Right Upper</label>
+                    <input type="range" class="custom-range" id="slider7" min="-180" max="180" step="10" value="-180">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backRightMiddleSlider">Back Right Middle</label>
+                    <input type="range" class="custom-range" id="slider8" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backRightLowerSlider">Back Right Lower</label>
+                    <input type="range" class="custom-range" id="slider9" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleLeftUpperSlider">Middle Left Upper</label>
+                    <input type="range" class="custom-range" id="slider10" min="-180" max="180" step="10" value="-180">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleLeftMiddleSlider">Middle Left Middle</label>
+                    <input type="range" class="custom-range" id="slider11" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleLeftLowerSlider">Middle Left Lower</label>
+                    <input type="range" class="custom-range" id="slider12" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleRightUpperSlider">Middle Right Upper</label>
+                    <input type="range" class="custom-range" id="slider13" min="-180" max="180" step="10" value="-180">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleRightMiddleSlider">Middle Right Middle</label>
+                    <input type="range" class="custom-range" id="slider14" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="middleRightLowerSlider">Middle Right Lower</label>
+                    <input type="range" class="custom-range" id="slider15" min="-180" max="180" step="10" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="frontLeftUpperSlider">Front Left Upper</label>
+                    <input type="range" class="custom-range" id="slider16" min="-180" max="180" step="10" value="-180">
+                </div>
 
+                <div class="form-group">
+                    <label for="frontLeftMiddleSlider">Front Left Middle</label>
+                    <input type="range" class="custom-range" id="slider17" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontLeftLowerSlider">Front Left Lower</label>
+                    <input type="range" class="custom-range" id="slider18" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontMiddleUpperSlider">Front Middle Upper</label>
+                    <input type="range" class="custom-range" id="slider19" min="-180" max="180" step="10" value="-180">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontMiddleMiddleSlider">Front Middle Middle</label>
+                    <input type="range" class="custom-range" id="slider20" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontMiddleLowerSlider">Front Middle Lower</label>
+                    <input type="range" class="custom-range" id="slider21" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontRightUpperSlider">Front Right Upper</label>
+                    <input type="range" class="custom-range" id="slider22" min="-180" max="180" step="10" value="-180">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontRightMiddleSlider">Front Right Middle</label>
+                    <input type="range" class="custom-range" id="slider23" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="frontRightLowerSlider">Front Right Lower</label>
+                    <input type="range" class="custom-range" id="slider24" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="rotateCameraYSlider">Rotate Camera Y</label>
+                    <input type="range" class="custom-range" id="slider25" min="-180" max="180" step="10" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="rotateCameraXSlider">Rotate Camera X</label>
+                    <input type="range" class="custom-range" id="slider26" min="-180" max="180" step="10" value="0">
+                </div>
+
+                                <!-- Action Buttons -->
+                                <button class="btn btn-primary btn-block mt-4">Save</button>
+                                <button class="btn btn-secondary btn-block">Reset</button>
+                            </div>
+                        </div>
+                    </div>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
     attribute  vec4 vPosition;
@@ -9,6 +198,9 @@
     uniform vec4 ambientProduct, diffuseProduct, specularProduct;
     uniform mat4 modelViewMatrix;
     uniform mat4 projectionMatrix;
+    uniform mat4 cameraMatrixY;
+    uniform mat4 cameraMatrixX;
+
     uniform vec4 lightPosition;
     uniform float shininess;
     void main()
@@ -45,7 +237,7 @@
         specular = vec4(0.0, 0.0, 0.0, 1.0);
         }
     
-        gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixY * cameraMatrixX;
         fColor = ambient + diffuse +specular;
     
         fColor.a = 1.0;
@@ -69,141 +261,9 @@
 <script type="text/javascript" src="./Common/MV.js"></script>
 <script type="text/javascript" src="figure.js"></script>
 
-<div id="slider0">
-    torso angle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
+</body>
 
-<div id="slider1">
-    Front Left Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
 
-<div id="slider2">
-    Front Left Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider3">
-    Front Left Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider4">
-    Front Middle Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-
-<div id="slider5">
-    Front Middle Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider6">
-    Front Middle Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider7">
-    Front Right Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-
-<div id="slider8">
-    Front Right Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider9">
-    Front Right Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider10">
-    Middle Left Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-
-<div id="slider11">
-    Middle Left Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider12">
-    Middle Left Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider13">
-    Middle Right Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-
-<div id="slider14">
-    Middle Right Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider15">
-    Middle Right Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider16">
-    Back Left Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-
-<div id="slider17">
-    Back Left Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider18">
-    Back Left Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider19">
-    Back Middle Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-    
-<div id="slider20">
-    Back Middle Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-    
-<div id="slider21">
-    Back Middle Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-    
-<div id="slider22">
-    Back Right Upper -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="-180"/>180
-</div><br/>
-    
-<div id="slider23">
-    Back Right Middle -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-    
-<div id="slider24">
-    Back Right Lower -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider25">
-    Rotate Camera Y -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-
-<div id="slider26">
-    Rotate Camera x -180 <input id="slide" type="range"
-    min="-180" max="180" step="10" value="0"/>180
-</div><br/>
-    
 <body>
 <canvas id="gl-canvas" width="512" height="512"
 Oops ... your browser doesn't support the HTML5 canvas element
