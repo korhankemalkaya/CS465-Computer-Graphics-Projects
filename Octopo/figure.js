@@ -64,6 +64,16 @@ var theta = [0,
     -180, 0, 0,
     -180, 0, 0];
 
+var neutralTheta = [0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0,
+    -180, 0, 0];
+
 var thetaArr = [[0,
     -180, 0, 0,
     -180, 0, 0,
@@ -309,6 +319,80 @@ function initNodes(Id){
     }
 }
 
+function initAllNodes(){
+    initNodes(torsoId);
+    initNodes(legs[0][0]);
+    initNodes(legs[0][1]);
+    initNodes(legs[0][2]);
+    initNodes(legs[1][0]);
+    initNodes(legs[1][1]);
+    initNodes(legs[1][2]);
+    initNodes(legs[2][0]);
+    initNodes(legs[2][1]);
+    initNodes(legs[2][2]);
+    initNodes(legs[3][0]);
+    initNodes(legs[3][1]);
+    initNodes(legs[3][2]);
+    initNodes(legs[4][0]);
+    initNodes(legs[4][1]);
+    initNodes(legs[4][2]);
+    initNodes(legs[5][0]);
+    initNodes(legs[5][1]);
+    initNodes(legs[5][2]);
+    initNodes(legs[6][0]);
+    initNodes(legs[6][1]);
+    initNodes(legs[6][2]);
+    initNodes(legs[7][0]);
+    initNodes(legs[7][1]);
+    initNodes(legs[7][2]);
+}
+
+function resetCamera(){
+    cameraMatrixY = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+    ];
+    
+    cameraMatrixX = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+    ];
+}
+
+function resetAllSliders(){
+    document.getElementById("slider0").value = neutralTheta[0];
+    document.getElementById("slider1").value = neutralTheta[1];
+    document.getElementById("slider2").value = neutralTheta[2];
+    document.getElementById("slider3").value = neutralTheta[3];
+    document.getElementById("slider4").value = neutralTheta[4];
+    document.getElementById("slider5").value = neutralTheta[5];
+    document.getElementById("slider6").value = neutralTheta[6];
+    document.getElementById("slider7").value = neutralTheta[7];
+    document.getElementById("slider8").value = neutralTheta[8];
+    document.getElementById("slider9").value = neutralTheta[9];
+    document.getElementById("slider10").value = neutralTheta[10];
+    document.getElementById("slider11").value = neutralTheta[11];
+    document.getElementById("slider12").value = neutralTheta[12];
+    document.getElementById("slider13").value = neutralTheta[13];
+    document.getElementById("slider14").value = neutralTheta[14];
+    document.getElementById("slider15").value = neutralTheta[15];
+    document.getElementById("slider16").value = neutralTheta[16];
+    document.getElementById("slider17").value = neutralTheta[17];
+    document.getElementById("slider18").value = neutralTheta[18];
+    document.getElementById("slider19").value = neutralTheta[19];
+    document.getElementById("slider20").value = neutralTheta[20];
+    document.getElementById("slider21").value = neutralTheta[21];
+    document.getElementById("slider22").value = neutralTheta[22];
+    document.getElementById("slider23").value = neutralTheta[23];
+    document.getElementById("slider24").value = neutralTheta[24];
+    document.getElementById("slider25").value = 0;
+    document.getElementById("slider26").value = 0;
+}
+
 function traverse(Id){
     if(Id == null) return; 
     stack.push(modelViewMatrix);
@@ -545,35 +629,13 @@ window.onload = function init(){
         rotateX(radianDeg);
     };
 
-    //TODO: NEUTRAL POSE IMPLEMENTATION
-    /*document.getElementById("NeutralPose").onclick = function(){
-        theta[torsoId] = 0;
-        theta[legs[0][0]] = -180;
-        theta[legs[0][1]] = -180;
-        theta[legs[0][2]] = -180;
-        theta[legs[1][0]] = -180;
-        theta[legs[1][1]] = -180;
-        theta[legs[1][2]] = -180;
-        theta[legs[2][0]] = -180;
-        theta[legs[2][1]] = -180;
-        theta[legs[2][2]] = -180;
-        theta[legs[3][0]] = -180;
-        theta[legs[3][1]] = -180;
-        theta[legs[3][2]] = -180;
-        theta[legs[4][0]] = -180;
-        theta[legs[4][1]] = -180;
-        theta[legs[4][2]] = -180;
-        theta[legs[5][0]] = -180;
-        theta[legs[5][1]] = -180;
-        theta[legs[5][2]] = -180;
-        theta[legs[6][0]] = -180;
-        theta[legs[6][1]] = -180;
-        theta[legs[6][2]] = -180;
-        theta[legs[7][0]] = -180;
-        theta[legs[7][1]] = -180;
-        theta[legs[7][2]] = -180;
-        initNodes(torsoId);
-    };*/
+    //Neutral Pose Button
+    document.getElementById("neutralPoseButton").addEventListener("click", function(){
+        theta = neutralTheta;
+        initAllNodes();
+        resetAllSliders();
+        resetCamera();
+    });
 
     // This is the event listener for the save button
     var saveButton = document.getElementById('savebutton');
@@ -615,8 +677,7 @@ window.onload = function init(){
     var saveFrameButton = document.getElementById("saveframebutton");
     saveFrameButton.addEventListener("click", function(){
         thetaArr.push(theta);
-    }
-    );
+    });
 
     var uploadInput = document.getElementById("uploadconfig");
     var uploadButton = document.getElementById("uploadbutton");
@@ -717,5 +778,4 @@ function interpolate( currArr) {
 //Silindir yapisi, tipi duzeltme
 // Iki tane animasyon butonu
 // UI - arkaya deniz koymayi denesene
-// Neutral pose butonu
 // Constraints on legs. Yani bacaklar kafayi dönüyor falan
