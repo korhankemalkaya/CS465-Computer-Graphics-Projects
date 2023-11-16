@@ -1,3 +1,4 @@
+//Variable Initiation
 var delay = 0;
 
 var canvas;
@@ -101,11 +102,14 @@ var materialDiffuse = vec4( 0.6, 0.0, 0.4, 1.0);
 var materialSpecular = vec4( 0.6, 0.0, 0.4, 1.0 );
 var materialShininess = 80.0;
 
+//Functions
 
+//Degree to radians converter
 function degreeToRadians(degreeVar){
     return degreeVar * Math.PI / 180;
 }
 
+//Camera rotate around y axis
 function rotateY(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
@@ -114,10 +118,9 @@ function rotateY(angleVar){
     cameraMatrixY[2] = -sinVar;
     cameraMatrixY[8] = sinVar;
     cameraMatrixY[10] = cosVar;
-
-    //render();
 }
 
+//Camera rotate around x axis
 function rotateX(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
@@ -126,8 +129,6 @@ function rotateX(angleVar){
     cameraMatrixX[6] = sinVar;
     cameraMatrixX[9] = -sinVar;
     cameraMatrixX[10] = cosVar;
-
-   // render();
 }
 
 function scale4(a, b, c){
@@ -147,7 +148,6 @@ function createNode(transform, render, sibling, child){
     }
     return node;
 }
-
 
 function initNodes(Id){
     var m = mat4();
@@ -307,7 +307,6 @@ function initNodes(Id){
         figure[legs[7][2]] = createNode( m, lowerLeg, null, null );
         break;
     }
-
 }
 
 function traverse(Id){
@@ -354,7 +353,6 @@ function quad(a, b, c, d){
     var normal = cross(t1, t2);
     var normal = vec3(normal);
 
-
     pointsArray.push(vertices[a]);
     normalsArray.push(normal);
     pointsArray.push(vertices[b]);
@@ -369,7 +367,6 @@ function quad(a, b, c, d){
     normalsArray.push(normal);
 }
 
-
 function cube(){
     quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
@@ -379,9 +376,7 @@ function cube(){
     quad( 5, 4, 0, 1 );
 }
 
-
 window.onload = function init(){
-
     canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
@@ -392,9 +387,7 @@ window.onload = function init(){
     
     gl.enable(gl.DEPTH_TEST);
 
-    //
     //  Load shaders and initialize attribute buffers
-    //
     program = initShaders( gl, "vertex-shader", "fragment-shader");
     
     gl.useProgram( program);
@@ -423,7 +416,6 @@ window.onload = function init(){
     cameraMatrixLocY = gl.getUniformLocation( program, "cameraMatrixY" );
     cameraMatrixLocX = gl.getUniformLocation( program, "cameraMatrixX" );
 
-
     ambientProduct = mult(lightAmbient, materialAmbient);
     diffuseProduct = mult(lightDiffuse, materialDiffuse);
     specularProduct = mult(lightSpecular, materialSpecular);
@@ -443,114 +435,116 @@ window.onload = function init(){
     gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
     gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
   
+    //Initiation for sliders
     document.getElementById("slider0").onchange = function() {
-        theta[torsoId ] = event.srcElement.value;
+        theta[torsoId ] = parseInt(event.srcElement.value);
         initNodes(torsoId);
     };
     document.getElementById("slider1").onchange = function() {
-        theta[legs[0][0]] = event.srcElement.value;
+        theta[legs[0][0]] = parseInt(event.srcElement.value);
         initNodes(legs[0][0]);
     };
     document.getElementById("slider2").onchange = function() {
-        theta[legs[0][1]] =  event.srcElement.value;
+        theta[legs[0][1]] = parseInt(event.srcElement.value);
         initNodes(legs[0][1]);
     };
     document.getElementById("slider3").onchange = function() {
-        theta[legs[0][2]] =  event.srcElement.value;
+        theta[legs[0][2]] = parseInt(event.srcElement.value);
         initNodes(legs[0][2]);
     };
     document.getElementById("slider4").onchange = function() {
-        theta[legs[1][0]] = event.srcElement.value;
+        theta[legs[1][0]] = parseInt(event.srcElement.value);
         initNodes(legs[1][0]);
     };
     document.getElementById("slider5").onchange = function() {
-        theta[legs[1][1]] =  event.srcElement.value;
+        theta[legs[1][1]] = parseInt(event.srcElement.value);
         initNodes(legs[1][1]);
     };
     document.getElementById("slider6").onchange = function() {
-        theta[legs[1][2]] =  event.srcElement.value;
+        theta[legs[1][2]] = parseInt(event.srcElement.value);
         initNodes(legs[1][2]);
     };
     document.getElementById("slider7").onchange = function() {
-        theta[legs[2][0]] = event.srcElement.value;
+        theta[legs[2][0]] = parseInt(event.srcElement.value);
         initNodes(legs[2][0]);
     };
     document.getElementById("slider8").onchange = function() {
-        theta[legs[2][1]] =  event.srcElement.value;
+        theta[legs[2][1]] = parseInt(event.srcElement.value);
         initNodes(legs[2][1]);
     };
     document.getElementById("slider9").onchange = function() {
-        theta[legs[2][2]] =  event.srcElement.value;
+        theta[legs[2][2]] = parseInt(event.srcElement.value);
         initNodes(legs[2][2]);
     };
     document.getElementById("slider10").onchange = function() {
-        theta[legs[3][0]] = event.srcElement.value;
+        theta[legs[3][0]] = parseInt(event.srcElement.value);
         initNodes(legs[3][0]);
     };
     document.getElementById("slider11").onchange = function() {
-        theta[legs[3][1]] =  event.srcElement.value;
+        theta[legs[3][1]] = parseInt(event.srcElement.value);
         initNodes(legs[3][1]);
     };
     document.getElementById("slider12").onchange = function() {
-        theta[legs[3][2]] =  event.srcElement.value;
+        theta[legs[3][2]] = parseInt(event.srcElement.value);
         initNodes(legs[3][2]);
     };
     document.getElementById("slider13").onchange = function() {
-        theta[legs[4][0]] = event.srcElement.value;
+        theta[legs[4][0]] = parseInt(event.srcElement.value);
         initNodes(legs[4][0]);
     };
     document.getElementById("slider14").onchange = function() {
-        theta[legs[4][1]] =  event.srcElement.value;
+        theta[legs[4][1]] = parseInt(event.srcElement.value);
         initNodes(legs[4][1]);
     };
     document.getElementById("slider15").onchange = function() {
-        theta[legs[4][2]] =  event.srcElement.value;
+        theta[legs[4][2]] = parseInt(event.srcElement.value);
         initNodes(legs[4][2]);
     };
     document.getElementById("slider16").onchange = function() {
-        theta[legs[5][0]] = event.srcElement.value;
+        theta[legs[5][0]] = parseInt(event.srcElement.value);
         initNodes(legs[5][0]);
     };
     document.getElementById("slider17").onchange = function() {
-        theta[legs[5][1]] =  event.srcElement.value;
+        theta[legs[5][1]] = parseInt(event.srcElement.value);
         initNodes(legs[5][1]);
     };
     document.getElementById("slider18").onchange = function() {
-        theta[legs[5][2]] =  event.srcElement.value;
+        theta[legs[5][2]] = parseInt(event.srcElement.value);
         initNodes(legs[5][2]);
     };
     document.getElementById("slider19").onchange = function() {
-        theta[legs[6][0]] = event.srcElement.value;
+        theta[legs[6][0]] = parseInt(event.srcElement.value);
         initNodes(legs[6][0]);
     };
     document.getElementById("slider20").onchange = function() {
-        theta[legs[6][1]] =  event.srcElement.value;
+        theta[legs[6][1]] = parseInt(event.srcElement.value);
         initNodes(legs[6][1]);
     };
     document.getElementById("slider21").onchange = function() {
-        theta[legs[6][2]] =  event.srcElement.value;
+        theta[legs[6][2]] = parseInt(event.srcElement.value);
         initNodes(legs[6][2]);
     };
     document.getElementById("slider22").onchange = function() {
-        theta[legs[7][0]] = event.srcElement.value;
+        theta[legs[7][0]] = parseInt(event.srcElement.value);
         initNodes(legs[7][0]);
     };
     document.getElementById("slider23").onchange = function() {
-        theta[legs[7][1]] =  event.srcElement.value;
+        theta[legs[7][1]] = parseInt(event.srcElement.value);
         initNodes(legs[7][1]);
     };
     document.getElementById("slider24").onchange = function() {
-        theta[legs[7][2]] =  event.srcElement.value;
+        theta[legs[7][2]] = parseInt(event.srcElement.value);
         initNodes(legs[7][2]);
     };
     document.getElementById("slider25").onchange = function() {
-        radianDeg =  degreeToRadians(event.srcElement.value);
+        radianDeg = degreeToRadians(event.srcElement.value);
         rotateY(radianDeg);
     };
     document.getElementById("slider26").onchange = function() {
-        radianDeg =  degreeToRadians(event.srcElement.value);
+        radianDeg = degreeToRadians(event.srcElement.value);
         rotateX(radianDeg);
     };
+
     //TODO: NEUTRAL POSE IMPLEMENTATION
     /*document.getElementById("NeutralPose").onclick = function(){
         theta[torsoId] = 0;
@@ -580,45 +574,43 @@ window.onload = function init(){
         theta[legs[7][2]] = -180;
         initNodes(torsoId);
     };*/
-    // Code segment for uploading JSON config.
-// This is the event listener for the save button
-    var saveButton = document.getElementById('savebutton'); // Make sure this is the correct ID for your save button
+
+    // This is the event listener for the save button
+    var saveButton = document.getElementById('savebutton');
     saveButton.addEventListener("click", function() {
         try {
-            // Call the interpolate method and ensure it returns a value
+            //Interpolate the key frame theta calues to download
             var interpolatedThetaArr = interpolate(thetaArr);
             if (!interpolatedThetaArr) {
                 throw new Error('Interpolation function returned no value.');
             }
 
-            // Construct the JSON configuration object
+            //Json Config obj
             var config = {
                 thetaArr: interpolatedThetaArr
             };
 
-            // Convert the JSON object to a data URI
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
 
-            // Create an anchor element if it doesn't exist
+            //Create an anchor element if it doesn't exist
             var dlAnchorElem = document.getElementById('downloadAnchorElem');
             if (!dlAnchorElem) {
                 dlAnchorElem = document.createElement('a');
                 document.body.appendChild(dlAnchorElem);
             }
 
-            // Set the href and download attributes for the anchor element
+            //Set the href and download attributes for the anchor element
             dlAnchorElem.setAttribute("href", dataStr);
             dlAnchorElem.setAttribute("download", "config.json");
-
-            // Trigger the download
             dlAnchorElem.click();
 
-            // Clear the thetaArr if necessary
+            //Clear the thetaArr
             thetaArr = [];
         } catch (error) {
             console.error('An error occurred:', error);
         }
-    });    
+    });
+
     //It saves the current frame to the thetaArr so that it can be interpolated later.
     var saveFrameButton = document.getElementById("saveframebutton");
     saveFrameButton.addEventListener("click", function(){
@@ -626,23 +618,23 @@ window.onload = function init(){
     }
     );
 
-
-
     var uploadInput = document.getElementById("uploadconfig");
     var uploadButton = document.getElementById("uploadbutton");
     var animateButton = document.getElementById("animatebutton");
     var uploadMsg = document.getElementById("uploadmsg");
+
+    //Upload button functionality
     uploadButton.addEventListener("click", function(){
         var file = uploadInput.files[0];
         if(file){
-            var reader = new FileReader(); // File reader to read the file
+            var reader = new FileReader();
             var providedArr;
             reader.addEventListener('load', function() {
-                var result = JSON.parse(reader.result); // Parse the result into an object
-
+                var result = JSON.parse(reader.result);
+                //Store the thetaArr in text into a temp variable
                 providedArr = result.thetaArr;
-
                 if(providedArr){
+                    //save contents of file in thetaArr
                     thetaArr = providedArr;
                     animFrameLen = thetaArr.length -1;
                     animFrameCounter = 0;
@@ -659,10 +651,12 @@ window.onload = function init(){
         }
     });
 
+    //Delay slider
     document.getElementById("framedelay").onchange = function() {
         delay = this.value;
     };
 
+    //Run-Stop Animation Button
     animateButton.addEventListener("click", function(){
         animToggle = !animToggle;
     });
@@ -671,9 +665,7 @@ window.onload = function init(){
     render();
 }
 
-    
-
-
+//Render function
 var render = async function() {
     if (animToggle) {
         await new Promise(r => setTimeout(r, delay));
@@ -693,6 +685,7 @@ function run_anim(){
     theta = thetaArr[animFrameCounter];
     for(i=0; i<numNodes; i++) initNodes(i);
 }
+
 //Interpolation function
 function interpolate( currArr) {
     var interpolatedArr = [];
@@ -702,20 +695,15 @@ function interpolate( currArr) {
         var curr = currArr[i];
         var next = currArr[i + 1];
         var diff = [];
+        //Calculate differences of theta values in keyframes
         for (var j = 0; j < curr.length; j++) {
             diff.push((next[j] - curr[j]) / 10);
         }
+        //Generate intermediate theta values
         for (var k = 0; k < 9; k++) {
             var temp = [];
             for (var l = 0; l < curr.length; l++) {
-                //if (curr[l] + diff[l] * (k + 1) <= 180 && curr[l] + diff[l] * (k + 1) >= -180)
-                    temp.push(curr[l] + diff[l] * (k + 1));
-                //else if (curr[l] + diff[l] * (k + 1) > 180) {
-                 //   temp.push(180);
-                //}
-                //else if (curr[l] + diff[l] * (k + 1) < -180) {
-                 //   temp.push(-180);
-               // }
+                temp.push(curr[l] + diff[l] * (k + 1));
             }
             interpolatedArr.push(temp);
         }
@@ -728,8 +716,6 @@ function interpolate( currArr) {
 //KAFADAKI GOCUK-- QUAD fonksiyonu alakalı 
 //Silindir yapisi, tipi duzeltme
 // Iki tane animasyon butonu
-// Interpolation problemi
 // UI - arkaya deniz koymayi denesene
 // Neutral pose butonu
 // Constraints on legs. Yani bacaklar kafayi dönüyor falan
-
