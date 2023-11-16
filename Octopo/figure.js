@@ -678,7 +678,10 @@ window.onload = function init(){
     //It saves the current frame to the thetaArr so that it can be interpolated later.
     var saveFrameButton = document.getElementById("saveframebutton");
     saveFrameButton.addEventListener("click", function(){
-        thetaArr.push(theta);
+        thetaClone = JSON.parse(JSON.stringify(theta));
+        console.log(thetaClone);
+        thetaArr.push(thetaClone);
+        console.log(thetaArr  );
     });
 
     var uploadInput = document.getElementById("uploadconfig");
