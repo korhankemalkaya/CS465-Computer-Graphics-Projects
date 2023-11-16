@@ -644,14 +644,14 @@ window.onload = function init(){
     saveButton.addEventListener("click", function() {
         try {
             //Interpolate the key frame theta calues to download
-            var interpolatedThetaArr = interpolate(thetaArr);
-            if (!interpolatedThetaArr) {
+            var smoothInterpolatedThetaArr = interpolateHermite(thetaArr, 20);
+            if (!smoothInterpolatedThetaArr) {
                 throw new Error('Interpolation function returned no value.');
             }
 
             //Json Config obj
             var config = {
-                thetaArr: interpolatedThetaArr
+                thetaArr: smoothInterpolatedThetaArr
             };
 
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
@@ -750,34 +750,64 @@ function run_anim(){
     for(i=0; i<numNodes; i++) initNodes(i);
 }
 
-//Interpolation function
-function interpolate( currArr) {
+//Cubic Hermite Spline Interpolation function
+function interpolateHermite(currArr, stepsPerFrame) {
+    // If no steps per frame provided, default to 10
+    stepsPerFrame = stepsPerFrame || 10;
     var interpolatedArr = [];
-    var len = currArr.length;
-    for (var i = 0; i < len - 1; i++) {
-        interpolatedArr.push(currArr[i]);
-        var curr = currArr[i];
-        var next = currArr[i + 1];
-        var diff = [];
-        //Calculate differences of theta values in keyframes
-        for (var j = 0; j < curr.length; j++) {
-            diff.push((next[j] - curr[j]) / 10);
-        }
-        //Generate intermediate theta values
-        for (var k = 0; k < 9; k++) {
-            var temp = [];
-            for (var l = 0; l < curr.length; l++) {
-                temp.push(curr[l] + diff[l] * (k + 1));
-            }
-            interpolatedArr.push(temp);
+
+    if (currArr.length < 2) {
+        console.error("Not enough keyframes to interpolate.");
+        return currArr;
+    }
+
+    // Helper function to perform Hermite interpolation between two values
+    function hermiteInterpolate(y0, y1, y2, y3, mu, tension, bias) {
+        var mu2 = mu * mu;
+        var mu3 = mu2 * mu;
+        var m0 = (y1 - y0) * (1 + bias) * (1 - tension) / 2;
+        m0 += (y2 - y1) * (1 - bias) * (1 - tension) / 2;
+        var m1 = (y2 - y1) * (1 + bias) * (1 - tension) / 2;
+        m1 += (y3 - y2) * (1 - bias) * (1 - tension) / 2;
+        var a0 = 2 * mu3 - 3 * mu2 + 1;
+        var a1 = mu3 - 2 * mu2 + mu;
+        var a2 = mu3 - mu2;
+        var a3 = -2 * mu3 + 3 * mu2;
+
+        return (a0 * y1 + a1 * m0 + a2 * m1 + a3 * y2);
+    }
+
+    // Iterate over each segment
+    for (var i = 0; i < currArr.length - 1; i++) {
+        var p0 = (i === 0) ? currArr[i] : currArr[i - 1];
+        var p1 = currArr[i];
+        var p2 = currArr[i + 1];
+        var p3 = (i === currArr.length - 2) ? currArr[i + 1] : currArr[i + 2];
+
+        for (var step = 0; step < stepsPerFrame; step++) {
+            var mu = step / (stepsPerFrame - (step === stepsPerFrame - 1 ? 0 : 1));
+            var interpolatedFrame = p1.map(function (y1, index) {
+                var y0 = p0[index];
+                var y2 = p2[index];
+                var y3 = p3[index];
+                // Tension: 1 is high, 0 normal, -1 is low
+                // Bias: 0 is even, positive is towards first segment, negative towards the other
+                return hermiteInterpolate(y0, y1, y2, y3, mu, 0, 0);
+            });
+            interpolatedArr.push(interpolatedFrame);
         }
     }
-    interpolatedArr.push(currArr[len - 1]);
+
+    // Don't forget to add the last frame
+    interpolatedArr.push(currArr[currArr.length - 1]);
+
     return interpolatedArr;
 }
 
+
+
+
 //TODO:
-//KAFADAKI GOCUK-- QUAD fonksiyonu alakalı 
-//Silindir yapisi, tipi duzeltme
+//Silindir yapisi, tipi duzeltme || belki bakılır
 // Iki tane animasyon butonu
 // UI - arkaya deniz koymayi denesene
