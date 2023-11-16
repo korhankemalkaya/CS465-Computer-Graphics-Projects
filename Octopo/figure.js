@@ -55,36 +55,35 @@ var lowerLegWidth  = 0.4;
 var numNodes = 25;
 
 var theta = [0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0];
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0];
 
 var neutralTheta = [0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0];
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0];
 
 var thetaArr = [[0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0,
-    -180, 0, 0]] //Check if it is necessary
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0,
+    180, 0, 0]] 
 
-//TODO: CHECK IF SLIDER CASE MATH NECESSARY
 //Animation Variables
 var animFrameCounter = 0;
 var animFrameLen = thetaArr.length - 1;
@@ -363,32 +362,35 @@ function resetCamera(){
     ];
 }
 
-function resetAllSliders(){
-    document.getElementById("slider0").value = neutralTheta[0];
-    document.getElementById("slider1").value = neutralTheta[1];
-    document.getElementById("slider2").value = neutralTheta[2];
-    document.getElementById("slider3").value = neutralTheta[3];
-    document.getElementById("slider4").value = neutralTheta[4];
-    document.getElementById("slider5").value = neutralTheta[5];
-    document.getElementById("slider6").value = neutralTheta[6];
-    document.getElementById("slider7").value = neutralTheta[7];
-    document.getElementById("slider8").value = neutralTheta[8];
-    document.getElementById("slider9").value = neutralTheta[9];
-    document.getElementById("slider10").value = neutralTheta[10];
-    document.getElementById("slider11").value = neutralTheta[11];
-    document.getElementById("slider12").value = neutralTheta[12];
-    document.getElementById("slider13").value = neutralTheta[13];
-    document.getElementById("slider14").value = neutralTheta[14];
-    document.getElementById("slider15").value = neutralTheta[15];
-    document.getElementById("slider16").value = neutralTheta[16];
-    document.getElementById("slider17").value = neutralTheta[17];
-    document.getElementById("slider18").value = neutralTheta[18];
-    document.getElementById("slider19").value = neutralTheta[19];
-    document.getElementById("slider20").value = neutralTheta[20];
-    document.getElementById("slider21").value = neutralTheta[21];
-    document.getElementById("slider22").value = neutralTheta[22];
-    document.getElementById("slider23").value = neutralTheta[23];
-    document.getElementById("slider24").value = neutralTheta[24];
+function resetAllSliders(thetaArrTemp){
+    document.getElementById("slider0").value = thetaArrTemp[0];
+    document.getElementById("slider1").value = thetaArrTemp[1];
+    document.getElementById("slider2").value = thetaArrTemp[2];
+    document.getElementById("slider3").value = thetaArrTemp[3];
+    document.getElementById("slider4").value = thetaArrTemp[4];
+    document.getElementById("slider5").value = thetaArrTemp[5];
+    document.getElementById("slider6").value = thetaArrTemp[6];
+    document.getElementById("slider7").value = thetaArrTemp[7];
+    document.getElementById("slider8").value = thetaArrTemp[8];
+    document.getElementById("slider9").value = thetaArrTemp[9];
+    document.getElementById("slider10").value = thetaArrTemp[10];
+    document.getElementById("slider11").value = thetaArrTemp[11];
+    document.getElementById("slider12").value = thetaArrTemp[12];
+    document.getElementById("slider13").value = thetaArrTemp[13];
+    document.getElementById("slider14").value = thetaArrTemp[14];
+    document.getElementById("slider15").value = thetaArrTemp[15];
+    document.getElementById("slider16").value = thetaArrTemp[16];
+    document.getElementById("slider17").value = thetaArrTemp[17];
+    document.getElementById("slider18").value = thetaArrTemp[18];
+    document.getElementById("slider19").value = thetaArrTemp[19];
+    document.getElementById("slider20").value = thetaArrTemp[20];
+    document.getElementById("slider21").value = thetaArrTemp[21];
+    document.getElementById("slider22").value = thetaArrTemp[22];
+    document.getElementById("slider23").value = thetaArrTemp[23];
+    document.getElementById("slider24").value = thetaArrTemp[24];
+}
+
+function resetCameraSliders(){
     document.getElementById("slider25").value = 0;
     document.getElementById("slider26").value = 0;
 }
@@ -633,8 +635,9 @@ window.onload = function init(){
     document.getElementById("neutralPoseButton").addEventListener("click", function(){
         theta = neutralTheta;
         initAllNodes();
-        resetAllSliders();
+        resetAllSliders(neutralTheta);
         resetCamera();
+        resetCameraSliders();
     });
 
     // This is the event listener for the save button
@@ -744,6 +747,7 @@ function run_anim(){
     if(animFrameCounter > animFrameLen)
         animFrameCounter = 0
     theta = thetaArr[animFrameCounter];
+    resetAllSliders(theta);
     for(i=0; i<numNodes; i++) initNodes(i);
 }
 
@@ -778,4 +782,3 @@ function interpolate( currArr) {
 //Silindir yapisi, tipi duzeltme
 // Iki tane animasyon butonu
 // UI - arkaya deniz koymayi denesene
-// Constraints on legs. Yani bacaklar kafayi dönüyor falan
