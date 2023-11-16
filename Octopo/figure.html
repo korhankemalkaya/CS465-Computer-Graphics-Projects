@@ -5,28 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octopus Model</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS for additional styling if needed -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
         body {
             background-color: #f7f7f7;
         }
         .canvas-container {
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-image: url('background.jpg'); 
+        background-size: cover;
+        background-position: center;
+        padding: 20px;
+        background-color: transparent; /* Make sure the canvas background is transparent */
+        border-radius: 4px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative; /* Position relative to the background */
+        width: 900; /* Match canvas width */
+        height: 900px; /* Match canvas height */
         }
-        .slider-container {
-            margin: 20px 0;
+        canvas {
+        display: block; /* Remove extra space below canvas */
+        margin: auto; /* Center canvas in the container if smaller */
         }
-        .slider-container input {
+      
+      
+        .controls-container .card {
+        margin-top: 20px; /* Add some space at the top */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+        }
+
+        .controls-container .card-header {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            text-align: center;
+        }
+
+        .controls-container .slider-container {
+            margin-top: 10px;
+        }
+
+        .controls-container .form-label {
+            font-weight: bold;
+        }
+
+        .controls-container .form-range {
             width: 100%;
         }
-        .slider-label {
-            display: block;
-            margin-bottom: 5px;
+
+   
+        .button-group {
+    background-color: #f8f9fa; /* Light gray background */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.button-group .btn {
+    width: 100%; /* Full-width buttons */
+    margin-bottom: 10px; /* Spacing between buttons */
+}
+
+.button-group .filedesc {
+    font-weight: bold;
+    margin-bottom: 5px; /* Spacing under descriptions */
+}
+
+.button-group .form-range {
+    width: 100%; /* Full-width range slider */
+}
+
+.button-group .input-group {
+    justify-content: center; /* Center align file input and button */
+}
+
+.button-group .text-danger {
+    display: block; /* Error message display */
+    margin-top: 10px; /* Spacing above error message */
+}
+    
+        /* Ensure the canvas is not too big */
+        #gl-canvas {
+            max-width: 100%;
+            height: auto;
         }
         /* Add more custom styles if needed */
     </style>
@@ -36,169 +96,185 @@
         <div class="row">
             <!-- Canvas Column -->
             <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="gl-canvas" width="1200" height="1200">
-                            WebGL is not available.
-                        </canvas>
+                <div class="canvas-container">
+                    <canvas id="gl-canvas" width="900" height="900">
+                        WebGL is not available.
+                    </canvas>
+                </div>
+                <!-- Button group for animation save buttons -->
+                <div class="button-group text-center mt-3">
+                    <div class="upload mb-3">
+                        <p class="filedesc">Import Animation</p>
+                        <div class="input-group mb-2">
+                            <input type="file" class="form-control" accept="application/JSON" id="uploadconfig">
+                            <button class="btn btn-primary" id="uploadbutton">Upload</button>
+                        </div>
+                        <span id="uploadmsg" class="text-danger" style="display:none;">Error.</span>
+                    </div>
+                    <button class="btn btn-success my-2" id="animatebutton">Run/Stop Animation</button>
+                    <div>
+                        <p class="filedesc">Animation Delay</p>
+                        <input id="framedelay" class="form-range" type="range" min="0" max="1000" step="20" value="0">
+                    </div>
+                    <div class="download mt-3">
+                        <button class="btn btn-info me-2" id="savebutton">Save Animation</button>
+                        <button class="btn btn-info" id="saveframebutton">Save Current Frame</button>
+                    </div>
+                    <div class="neutralPose mt-3">
+                        <button class="btn btn-secondary" id="neutralPoseButton">Neutral Pose</button>
                     </div>
                 </div>
             </div>
             <!-- Sliders Column -->
-            <div class="col-md-4">
-                <h2>Controls</h2>
-                <!-- Slider Group -->
-                <div class="form-group">
-                    <label for="torsoSlider">Torso Angle</label>
-                    <input type="range" class="custom-range" id="slider0" min="-180" max="180" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backLeftUpperSlider">Back Left Upper</label>
-                    <input type="range" class="custom-range" id="slider1" min="100" max="330" step="10" value="180">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backLeftMiddleSlider">Back Left Middle</label>
-                    <input type="range" class="custom-range" id="slider2" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backLeftLowerSlider">Back Left Lower</label>
-                    <input type="range" class="custom-range" id="slider3" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backMiddleUpperSlider">Back Middle Upper</label>
-                    <input type="range" class="custom-range" id="slider4" min="100" max="330" step="10" value="180">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backMiddleMiddleSlider">Back Middle Middle</label>
-                    <input type="range" class="custom-range" id="slider5" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backMiddleLowerSlider">Back Middle Lower</label>
-                    <input type="range" class="custom-range" id="slider6" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backRightUpperSlider">Back Right Upper</label>
-                    <input type="range" class="custom-range" id="slider7" min="100" max="330" step="10" value="180">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backRightMiddleSlider">Back Right Middle</label>
-                    <input type="range" class="custom-range" id="slider8" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="backRightLowerSlider">Back Right Lower</label>
-                    <input type="range" class="custom-range" id="slider9" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleLeftUpperSlider">Middle Left Upper</label>
-                    <input type="range" class="custom-range" id="slider10" min="30" max="260" step="10" value="180">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleLeftMiddleSlider">Middle Left Middle</label>
-                    <input type="range" class="custom-range" id="slider11" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleLeftLowerSlider">Middle Left Lower</label>
-                    <input type="range" class="custom-range" id="slider12" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleRightUpperSlider">Middle Right Upper</label>
-                    <input type="range" class="custom-range" id="slider13" min="100" max="330" step="10" value="180">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleRightMiddleSlider">Middle Right Middle</label>
-                    <input type="range" class="custom-range" id="slider14" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="middleRightLowerSlider">Middle Right Lower</label>
-                    <input type="range" class="custom-range" id="slider15" min="-160" max="160" step="10" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="frontLeftUpperSlider">Front Left Upper</label>
-                    <input type="range" class="custom-range" id="slider16" min="30" max="260" step="10" value="180">
-                </div>
+            <div class="col-md-3">
+                <div class="controls-container">
+                    <div class="card">
+                        <div class="card-header">
+                            Controls
+                        </div>
+                        <div class="card-body">
+                            <div class="slider-container">
+                                <!-- Slider Group -->
+                        <div class="mb-3">
+                            <label for="torsoSlider">Torso Angle</label>
+                            <input type="range" class="form-range" id="slider0" min="-180" max="180" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backLeftUpperSlider">Back Left Upper</label>
+                            <input type="range" class="form-range" id="slider1" min="100" max="330" step="10" value="180">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backLeftMiddleSlider">Back Left Middle</label>
+                            <input type="range" class="form-range" id="slider2" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backLeftLowerSlider">Back Left Lower</label>
+                            <input type="range" class="form-range" id="slider3" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backMiddleUpperSlider">Back Middle Upper</label>
+                            <input type="range" class="form-range" id="slider4" min="100" max="330" step="10" value="180">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backMiddleMiddleSlider">Back Middle Middle</label>
+                            <input type="range" class="form-range" id="slider5" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backMiddleLowerSlider">Back Middle Lower</label>
+                            <input type="range" class="form-range" id="slider6" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backRightUpperSlider">Back Right Upper</label>
+                            <input type="range" class="form-range" id="slider7" min="100" max="330" step="10" value="180">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backRightMiddleSlider">Back Right Middle</label>
+                            <input type="range" class="form-range" id="slider8" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backRightLowerSlider">Back Right Lower</label>
+                            <input type="range" class="form-range" id="slider9" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleLeftUpperSlider">Middle Left Upper</label>
+                            <input type="range" class="form-range" id="slider10" min="30" max="260" step="10" value="180">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleLeftMiddleSlider">Middle Left Middle</label>
+                            <input type="range" class="form-range" id="slider11" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleLeftLowerSlider">Middle Left Lower</label>
+                            <input type="range" class="form-range" id="slider12" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleRightUpperSlider">Middle Right Upper</label>
+                            <input type="range" class="form-range" id="slider13" min="100" max="330" step="10" value="180">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleRightMiddleSlider">Middle Right Middle</label>
+                            <input type="range" class="form-range" id="slider14" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="middleRightLowerSlider">Middle Right Lower</label>
+                            <input type="range" class="form-range" id="slider15" min="-160" max="160" step="10" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="frontLeftUpperSlider">Front Left Upper</label>
+                            <input type="range" class="form-range" id="slider16" min="30" max="260" step="10" value="180">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontLeftMiddleSlider">Front Left Middle</label>
-                    <input type="range" class="custom-range" id="slider17" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontLeftMiddleSlider">Front Left Middle</label>
+                            <input type="range" class="form-range" id="slider17" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontLeftLowerSlider">Front Left Lower</label>
-                    <input type="range" class="custom-range" id="slider18" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontLeftLowerSlider">Front Left Lower</label>
+                            <input type="range" class="form-range" id="slider18" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontMiddleUpperSlider">Front Middle Upper</label>
-                    <input type="range" class="custom-range" id="slider19" min="30" max="260" step="10" value="180">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontMiddleUpperSlider">Front Middle Upper</label>
+                            <input type="range" class="form-range" id="slider19" min="30" max="260" step="10" value="180">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontMiddleMiddleSlider">Front Middle Middle</label>
-                    <input type="range" class="custom-range" id="slider20" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontMiddleMiddleSlider">Front Middle Middle</label>
+                            <input type="range" class="form-range" id="slider20" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontMiddleLowerSlider">Front Middle Lower</label>
-                    <input type="range" class="custom-range" id="slider21" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontMiddleLowerSlider">Front Middle Lower</label>
+                            <input type="range" class="form-range" id="slider21" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontRightUpperSlider">Front Right Upper</label>
-                    <input type="range" class="custom-range" id="slider22" min="30" max="260" step="10" value="180">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontRightUpperSlider">Front Right Upper</label>
+                            <input type="range" class="form-range" id="slider22" min="30" max="260" step="10" value="180">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontRightMiddleSlider">Front Right Middle</label>
-                    <input type="range" class="custom-range" id="slider23" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontRightMiddleSlider">Front Right Middle</label>
+                            <input type="range" class="form-range" id="slider23" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="frontRightLowerSlider">Front Right Lower</label>
-                    <input type="range" class="custom-range" id="slider24" min="-160" max="160" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="frontRightLowerSlider">Front Right Lower</label>
+                            <input type="range" class="form-range" id="slider24" min="-160" max="160" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="rotateCameraYSlider">Rotate Camera Y</label>
-                    <input type="range" class="custom-range" id="slider25" min="-180" max="180" step="10" value="0">
-                </div>
+                        <div class="mb-3">
+                            <label for="rotateCameraYSlider">Rotate Camera Y</label>
+                            <input type="range" class="form-range" id="slider25" min="-180" max="180" step="10" value="0">
+                        </div>
 
-                <div class="form-group">
-                    <label for="rotateCameraXSlider">Rotate Camera X</label>
-                    <input type="range" class="custom-range" id="slider26" min="-180" max="180" step="10" value="0">
+                        <div class="mb-3">
+                            <label for="rotateCameraXSlider">Rotate Camera X</label>
+                            <input type="range" class="form-range" id="slider26" min="-180" max="180" step="10" value="0">
+                        </div>
+                            </div>
+                        </div>
+                    </div>                        
                 </div>
-                <div class="upload">
-                    <p class="filedesc">Import Animation</p><br>
-                    <input type="file" accept="application/JSON" id="uploadconfig">
-                    <button id="uploadbutton">Upload Animation</button>
-                    <span id="uploadmsg" style="display:none">Error.</span>
-                    <button id="animatebutton">Run/Stop Animation</button>
-                    <p class="filedesc" style="justify-content: left">Animation Speed</p><br>
-                    <input id="framedelay" type="range" min="0" max="1000" step="20" value="0" style="width:100%;">
-                </div>
-                <div class="download">
-                    <button id="savebutton">Save Animation</button>
-                    <button id="saveframebutton">Save Current Frame</button>
-                </div>
-                <div class="neutralPose">
-                    <br>
-                    <button id="neutralPoseButton">Neutral Pose</button>
-                </div>
+            </div>
+                
             </div>
         </div>
     </div>
@@ -263,7 +339,9 @@
             gl_FragColor = fColor;
         }
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
     <script type="text/javascript" src="./Common/webgl-utils.js"></script>
     <script type="text/javascript" src="./Common/InitShaders.js"></script>
     <script type="text/javascript" src="./Common/MV.js"></script>
