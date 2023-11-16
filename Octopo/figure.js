@@ -106,8 +106,8 @@ var lightAmbient = vec4(0.3, 0.1, 0.3, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
-var materialAmbient = vec4( 0.0, 0.0, 1.0, 1.0 );
-var materialDiffuse = vec4( 0.6, 0.0, 0.4, 1.0);
+var materialAmbient = vec4( 0.5, 0.0, 0.1, 1.0 ); // Darker red with a touch of blue
+var materialDiffuse = vec4( 0.6, 0.1, 0.2, 1.0); // Dark red with a slight touch of green and less blue
 var materialSpecular = vec4( 0.6, 0.0, 0.4, 1.0 );
 var materialShininess = 80.0;
 
@@ -409,28 +409,28 @@ function torso(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5*torsoHeight, 0.0) );
     instanceMatrix = mult(instanceMatrix, scale4( torsoWidth, torsoHeight, torsoWidth));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLES, 4*i, 36);
 }
 
 function upperLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * upperLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(upperLegWidth, upperLegHeight, upperLegWidth) );
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLES, 4*i, 36);
 }
 
 function middleLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * middleLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(middleLegWidth, middleLegHeight, middleLegWidth) )
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLES, 4*i, 36);
 }
 
 function lowerLeg(){
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * lowerLegHeight, 0.0) );
 	instanceMatrix = mult(instanceMatrix, scale4(lowerLegWidth, lowerLegHeight, lowerLegWidth) )
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 36);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLES, 4*i, 36);
 }
 
 function quad(a, b, c, d){
@@ -469,8 +469,7 @@ window.onload = function init(){
     if ( !gl ) { alert( "WebGL isn't available" ); }
     
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 219/255, 240/255, 254/255, 1.0 );
-    
+    gl.clearColor( 0.0, 0.5, 0.7, 1.0 );    
     gl.enable(gl.DEPTH_TEST);
 
     //  Load shaders and initialize attribute buffers
