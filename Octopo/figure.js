@@ -469,7 +469,7 @@ window.onload = function init(){
     if ( !gl ) { alert( "WebGL isn't available" ); }
     
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.0, 0.5, 0.7, 1.0 );    
+    gl.clearColor( 0.0 , 0.0, 0.0, 0.0 );    
     gl.enable(gl.DEPTH_TEST);
 
     //  Load shaders and initialize attribute buffers
