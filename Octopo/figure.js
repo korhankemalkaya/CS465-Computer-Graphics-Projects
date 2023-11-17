@@ -55,12 +55,16 @@ var dancigAnim = [[0,180,0,0,180,0,0,180,0,0,180,0,0,180,0,0,180,0,0,180,0,0,180
 ,0,273.41157603149145,37.251785974631886,0,86.58842396850852,-37.251785974631886,0,86.58842396850852,-37.251785974631886,0,86.58842396850852,-37.251785974631886,0],[93.93206006706517,272.5513923312436,48.60183700247848,0,272.5513923312436,48.60183700247848,0,272.5513923312436,48.60183700247848,0,87.44860766875638,-48.60183700247848,0,272.5513923312436,48.60183700247848,0,87.44860766875638,-48.60183700247848,0,87.44860766875638,-48.60183700247848,0,87.44860766875638,-48.60183700247848,0],[100.51027846624872,271.74952616999565,59.190844146377025,0,271.74952616999565,59.190844146377025,0,271.74952616999565,59.190844146377025,0,88.25047383000437,-59.190844146377025,0,271.74952616999565,59.190844146377025,0,88.25047383000437,-59.190844146377025,0,88.25047383000437,-59.190844146377025,0,88.25047383000437,-59.190844146377025,0],[106.5111532293337,271.0497157019974,68.82198571220293,0,271.0497157019974,68.82198571220293,0,271.0497157019974,68.82198571220293,0,88.95028429800261,-68.82198571220293,0,271.0497157019974,68.82198571220293,0,88.95028429800261,-68.82198571220293,0,88.95028429800261,-68.82198571220293,0,88.95028429800261,-68.82198571220293,0],[111.82971278612041,270.4956990814988,77.29844000583172,0,270.4956990814988,77.29844000583172,0,270.4956990814988,77.29844000583172,0,89.50430091850123,-77.29844000583172,0,270.4956990814988,77.29844000583172,0,89.50430091850123,-77.29844000583172,0,89.50430091850123,-77.29844000583172,0,89.50430091850123,-77.29844000583172,0],[116.3609855664091,270.13121446274965,84.42338533313894,0,270.13121446274965,84.42338533313894,0,270.13121446274965,84.42338533313894,0,89.86878553725033,-84.42338533313894,0,270.13121446274965,84.42338533313894,0,89.86878553725033,-84.42338533313894,0,89.86878553725033,-84.42338533313894,0,89.86878553725033,-84.42338533313894,0],[116.56500000000001,270.11875,84.74062500000004,0,270.11875,84.74062500000004,0,270.11875,84.74062500000004,0,89.88125000000001,-84.74062500000004,0,270.11875,84.74062500000004,0,89.88125000000001,-84.74062500000004,0,89.88125000000001,-84.74062500000004,0,89.88125000000001,-84.74062500000004,0],[120,270,90,0,270,90,0,270,90,0,90,-90,0,270,90,0,90,-90,0,90,-90,0,90,-90,0]];
 
 //Variable Initiation
-var delay = 0;
 
+// Delay variable for animation speed
+var delayValue = 0;
+
+// Main variables for program
 var canvas;
 var gl;
 var program;
 
+// Matrix variables
 var projectionMatrix; 
 var modelViewMatrix;
 var instanceMatrix;
@@ -83,6 +87,7 @@ var cameraMatrixX = [
 ];
 var cameraMatrixLocX;
 
+// Vertices
 var vertices = [
     vec4( -0.5, -0.5,  0.5, 1.0 ),
     vec4( -0.5,  0.5,  0.5, 1.0 ),
@@ -94,9 +99,11 @@ var vertices = [
     vec4( 0.5, -0.5, -0.5, 1.0 )
 ];
 
+// Node ids
 var torsoId = 0;
 var legs = [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18],[19,20,21],[22,23,24]];
 
+// Node sizes
 var torsoHeight = 6.0;
 var torsoWidth = 5.0;
 
@@ -110,6 +117,7 @@ var lowerLegWidth  = 0.4;
 
 var numNodes = 25;
 
+// Theta array
 var theta = [0,
     180, 0, 0,
     180, 0, 0,
@@ -120,6 +128,7 @@ var theta = [0,
     180, 0, 0,
     180, 0, 0];
 
+// Neutral position theta values
 var neutralTheta = [0,
     180, 0, 0,
     180, 0, 0,
@@ -130,6 +139,7 @@ var neutralTheta = [0,
     180, 0, 0,
     180, 0, 0];
 
+// Array of theta arrays for animation purposes
 var thetaArr = [[0,
     180, 0, 0,
     180, 0, 0,
@@ -138,12 +148,12 @@ var thetaArr = [[0,
     180, 0, 0,
     180, 0, 0,
     180, 0, 0,
-    180, 0, 0]] 
+    180, 0, 0]];
 
 //Animation Variables
-var animFrameCounter = 0;
-var animFrameLen = thetaArr.length - 1;
-var animToggle = false;
+var animationFramesIndex = 0;
+var numberOfAnimationFrames = thetaArr.length - 1;
+var isPlayAnim = false;
 
 var stack = [];
 
@@ -157,13 +167,16 @@ var modelViewLoc;
 var pointsArray = [];
 var normalsArray = [];
 
+// Light variables
 var lightPosition = vec4(1.0, 0.0, 1.0, 0.0 );
 var lightAmbient = vec4(0.3, 0.1, 0.3, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
-var materialAmbient = vec4( 0.5, 0.0, 0.1, 1.0 ); // Darker red with a touch of blue
-var materialDiffuse = vec4( 0.6, 0.1, 0.2, 1.0); // Dark red with a slight touch of green and less blue
+// Darker red with a touch of blue
+var materialAmbient = vec4( 0.5, 0.0, 0.1, 1.0 );
+// Dark red with a slight touch of green and less blue 
+var materialDiffuse = vec4( 0.6, 0.1, 0.2, 1.0); 
 var materialSpecular = vec4( 0.6, 0.0, 0.4, 1.0 );
 var materialShininess = 80.0;
 
@@ -175,7 +188,7 @@ function degreeToRadians(degreeVar){
 }
 
 //Camera rotate around y axis
-function rotateY(angleVar){
+function cameraRotateY(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
 
@@ -186,7 +199,7 @@ function rotateY(angleVar){
 }
 
 //Camera rotate around x axis
-function rotateX(angleVar){
+function cameraRotateX(angleVar){
     var cosVar = Math.cos(angleVar);
     var sinVar = Math.sin(angleVar);
 
@@ -374,6 +387,7 @@ function initNodes(Id){
     }
 }
 
+//Initiating all nodes in one function
 function initAllNodes(){
     initNodes(torsoId);
     initNodes(legs[0][0]);
@@ -402,6 +416,7 @@ function initAllNodes(){
     initNodes(legs[7][2]);
 }
 
+//Reset both camera axis
 function resetCamera(){
     cameraMatrixY = [
         1,0,0,0,
@@ -418,6 +433,7 @@ function resetCamera(){
     ];
 }
 
+//Reset all sliders except camera sliders (reset all node sliders)
 function resetAllSliders(thetaArrTemp){
     document.getElementById("slider0").value = thetaArrTemp[0];
     document.getElementById("slider1").value = thetaArrTemp[1];
@@ -446,24 +462,25 @@ function resetAllSliders(thetaArrTemp){
     document.getElementById("slider24").value = thetaArrTemp[24];
 }
 
+//Reset camera sliders
 function resetCameraSliders(){
     document.getElementById("slider25").value = 0;
     document.getElementById("slider26").value = 0;
 }
 
-function traverse(Id){
-    if(Id == null) return; 
+function traverse(id){
+    if(id == null) return; 
     stack.push(modelViewMatrix);
-    modelViewMatrix = mult(modelViewMatrix, figure[Id].transform);
-    figure[Id].render();
-    if(figure[Id].child != null) traverse(figure[Id].child); 
+    modelViewMatrix = mult(modelViewMatrix, figure[id].transform);
+    figure[id].render();
+    if(figure[id].child != null) traverse(figure[id].child); 
     modelViewMatrix = stack.pop();
-    if(figure[Id].sibling != null) traverse(figure[Id].sibling); 
+    if(figure[id].sibling != null) traverse(figure[id].sibling); 
 }
 
 function torso(){
-    instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5*torsoHeight, 0.0) );
-    instanceMatrix = mult(instanceMatrix, scale4( torsoWidth, torsoHeight, torsoWidth));
+    instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * torsoHeight, 0.0) );
+    instanceMatrix = mult(instanceMatrix, scale4(torsoWidth, torsoHeight, torsoWidth));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
     for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLES, 4*i, 36);
 }
@@ -534,6 +551,7 @@ window.onload = function init(){
     gl.useProgram( program);
     cube();
 
+    //Buffers
     var nBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW );
@@ -550,6 +568,7 @@ window.onload = function init(){
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
+    //Matrices
     projectionMatrix = ortho(-10.0,10.0,-10.0, 10.0,-10.0,10.0);
     instanceMatrix = mat4();
     modelViewMatrix = mat4();
@@ -557,28 +576,24 @@ window.onload = function init(){
     cameraMatrixLocY = gl.getUniformLocation( program, "cameraMatrixY" );
     cameraMatrixLocX = gl.getUniformLocation( program, "cameraMatrixX" );
 
+    //Light and material
     ambientProduct = mult(lightAmbient, materialAmbient);
     diffuseProduct = mult(lightDiffuse, materialDiffuse);
     specularProduct = mult(lightSpecular, materialSpecular);
 
-    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
-        flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
-        flatten(diffuseProduct) );
-    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
-        flatten(specularProduct) );
-    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"),
-        flatten(lightPosition) );
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition));
 
-    gl.uniform1f(gl.getUniformLocation(program,
-        "shininess"),materialShininess);
+    gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
 
-    gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
-    gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelViewMatrix"), false, flatten(modelViewMatrix));
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"), false, flatten(projectionMatrix));
   
     //Initiation for sliders
     document.getElementById("slider0").onchange = function() {
-        theta[torsoId ] = parseInt(event.srcElement.value);
+        theta[torsoId] = parseInt(event.srcElement.value);
         initNodes(torsoId);
     };
     document.getElementById("slider1").onchange = function() {
@@ -679,11 +694,11 @@ window.onload = function init(){
     };
     document.getElementById("slider25").onchange = function() {
         radianDeg = degreeToRadians(event.srcElement.value);
-        rotateY(radianDeg);
+        cameraRotateY(radianDeg);
     };
     document.getElementById("slider26").onchange = function() {
         radianDeg = degreeToRadians(event.srcElement.value);
-        rotateX(radianDeg);
+        cameraRotateX(radianDeg);
     };
 
     //Neutral Pose Button
@@ -700,29 +715,31 @@ window.onload = function init(){
     saveButton.addEventListener("click", function() {
         try {
             //Interpolate the key frame theta calues to download
-            var smoothInterpolatedThetaArr = interpolateHermite(thetaArr, 20);
-            if (!smoothInterpolatedThetaArr) {
+            var smoothThetaArray = interpolateHermite(thetaArr, 20);
+
+            //Error check
+            if (!smoothThetaArray) {
                 throw new Error('Interpolation function returned no value.');
             }
 
             //Json Config obj
             var config = {
-                thetaArr: smoothInterpolatedThetaArr
+                thetaArr: smoothThetaArray
             };
 
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
+            var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
 
             //Create an anchor element if it doesn't exist
-            var dlAnchorElem = document.getElementById('downloadAnchorElem');
-            if (!dlAnchorElem) {
-                dlAnchorElem = document.createElement('a');
-                document.body.appendChild(dlAnchorElem);
+            var anchor = document.getElementById('downloadAnchorElem');
+            if (!anchor) {
+                anchor = document.createElement('a');
+                document.body.appendChild(anchor);
             }
 
             //Set the href and download attributes for the anchor element
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "config.json");
-            dlAnchorElem.click();
+            anchor.setAttribute("href", data);
+            anchor.setAttribute("download", "config.json");
+            anchor.click();
 
             //Clear the thetaArr
             thetaArr = [];
@@ -732,69 +749,68 @@ window.onload = function init(){
     });
 
     //It saves the current frame to the thetaArr so that it can be interpolated later.
+    //Saves clone as saving references result in data loss
     var saveFrameButton = document.getElementById("saveframebutton");
     saveFrameButton.addEventListener("click", function(){
         thetaClone = JSON.parse(JSON.stringify(theta));
         thetaArr.push(thetaClone);
     });
 
-    var uploadInput = document.getElementById("uploadconfig");
+    var uploadFiles = document.getElementById("uploadconfig");
     var uploadButton = document.getElementById("uploadbutton");
     var animateButton = document.getElementById("animatebutton");
-    var uploadMsg = document.getElementById("uploadmsg");
+    var uploadMessage = document.getElementById("uploadmsg");
 
     //Upload button functionality
     uploadButton.addEventListener("click", function(){
-        var file = uploadInput.files[0];
+        var file = uploadFiles.files[0];
         if(file){
             var reader = new FileReader();
-            var providedArr;
+            var fileContentArray;
             reader.addEventListener('load', function() {
                 var result = JSON.parse(reader.result);
                 //Store the thetaArr in text into a temp variable
-                providedArr = result.thetaArr;
-                if(providedArr){
+                fileContentArray = result.thetaArr;
+                if(fileContentArray){
                     //save contents of file in thetaArr
-                    thetaArr = providedArr;
-                    animFrameLen = thetaArr.length -1;
-                    animFrameCounter = 0;
-                    uploadMsg.style.display = "none";
+                    thetaArr = fileContentArray;
+                    numberOfAnimationFrames = thetaArr.length - 1;
+                    animationFramesIndex = 0;
+                    uploadMessage.style.display = "none";
                 } else {
-                    uploadMsg.innerText = "This is not a suitable config!";
-                    uploadMsg.style.display = "block";
+                    uploadMessage.innerText = "File content error!";
+                    uploadMessage.style.display = "block";
                 }
             });
             reader.readAsText(file);
         } else {
-            uploadMsg.innerText = "No file has been provided!";
-            uploadMsg.style.display = "block";
+            uploadMessage.innerText = "File upload error!";
+            uploadMessage.style.display = "block";
         }
     });
 
     //Delay slider
     document.getElementById("framedelay").onchange = function() {
-        delay = this.value;
+        delayValue = this.value;
     };
 
     //Run-Stop Animation Button
     animateButton.addEventListener("click", function(){
-        animToggle = !animToggle;
+        isPlayAnim = !isPlayAnim;
     });
 
     document.getElementById("swimmingAnim").addEventListener("click", function(){
-        animToggle = true;
+        isPlayAnim = true;
         thetaArr = swimmingAnim;
-        animFrameLen = thetaArr.length -1;
-        animFrameCounter = 0;
-
+        numberOfAnimationFrames = thetaArr.length -1;
+        animationFramesIndex = 0;
     });
 
     document.getElementById("dancingAnim").addEventListener("click", function(){
-        animToggle = true;
+        isPlayAnim = true;
         thetaArr = dancigAnim;
-        animFrameLen = thetaArr.length -1;
-        animFrameCounter = 0;
-
+        numberOfAnimationFrames = thetaArr.length -1;
+        animationFramesIndex = 0;
     });
 
     for(i=0; i<numNodes; i++) initNodes(i);
@@ -803,9 +819,10 @@ window.onload = function init(){
 
 //Render function
 var render = async function() {
-    if (animToggle) {
-        await new Promise(r => setTimeout(r, delay));
-        run_anim();
+    //Play animation if selected
+    if (isPlayAnim) {
+        await new Promise(r => setTimeout(r, delayValue));
+        runAnimation();
     }
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
     gl.uniformMatrix4fv( cameraMatrixLocY, false, flatten(cameraMatrixY));
@@ -814,11 +831,18 @@ var render = async function() {
     requestAnimFrame(render);
 }
 
-function run_anim(){
-    animFrameCounter++;
-    if(animFrameCounter > animFrameLen)
-        animFrameCounter = 0
-    theta = thetaArr[animFrameCounter];
+function runAnimation(){
+    //iterate frame
+    animationFramesIndex++;
+    
+    //loop if there are no more frames in the animation
+    if(animationFramesIndex > numberOfAnimationFrames){
+        animationFramesIndex = 0;
+    }
+
+    //load theta
+    theta = thetaArr[animationFramesIndex];
+    //reset sliders according to the theta values
     resetAllSliders(theta);
     for(i=0; i<numNodes; i++) initNodes(i);
 }
@@ -829,23 +853,24 @@ function interpolateHermite(currArr, stepsPerFrame) {
     stepsPerFrame = stepsPerFrame || 10;
     var interpolatedArr = [];
 
+    // Check if there are enough keyframes to interpolate
     if (currArr.length < 2) {
         console.error("Not enough keyframes to interpolate.");
         return currArr;
     }
 
     // Helper function to perform Hermite interpolation between two values
-    function hermiteInterpolate(y0, y1, y2, y3, mu, tension, bias) {
-        var mu2 = mu * mu;
-        var mu3 = mu2 * mu;
-        var m0 = (y1 - y0) * (1 + bias) * (1 - tension) / 2;
-        m0 += (y2 - y1) * (1 - bias) * (1 - tension) / 2;
-        var m1 = (y2 - y1) * (1 + bias) * (1 - tension) / 2;
-        m1 += (y3 - y2) * (1 - bias) * (1 - tension) / 2;
-        var a0 = 2 * mu3 - 3 * mu2 + 1;
-        var a1 = mu3 - 2 * mu2 + mu;
-        var a2 = mu3 - mu2;
-        var a3 = -2 * mu3 + 3 * mu2;
+    function helper(y0, y1, y2, y3, mu) {
+        var muSquared = mu * mu;
+        var muCube = muSquared * mu;
+        var m0 = (y1 - y0) / 2;
+        m0 += (y2 - y1) / 2;
+        var m1 = (y2 - y1) / 2;
+        m1 += (y3 - y2) / 2;
+        var a0 = 2 * muCube - 3 * muSquared + 1;
+        var a1 = muCube - 2 * muSquared + mu;
+        var a2 = muCube - muSquared;
+        var a3 = -2 * muCube + 3 * muSquared;
 
         return (a0 * y1 + a1 * m0 + a2 * m1 + a3 * y2);
     }
@@ -863,15 +888,11 @@ function interpolateHermite(currArr, stepsPerFrame) {
                 var y0 = p0[index];
                 var y2 = p2[index];
                 var y3 = p3[index];
-                // Tension: 1 is high, 0 normal, -1 is low
-                // Bias: 0 is even, positive is towards first segment, negative towards the other
-                return hermiteInterpolate(y0, y1, y2, y3, mu, 0, 0);
+                return helper(y0, y1, y2, y3, mu);
             });
             interpolatedArr.push(interpolatedFrame);
         }
     }
-
-    // Don't forget to add the last frame
     interpolatedArr.push(currArr[currArr.length - 1]);
 
     return interpolatedArr;
