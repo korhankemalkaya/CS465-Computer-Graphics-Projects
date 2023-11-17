@@ -782,15 +782,19 @@ window.onload = function init(){
     });
 
     document.getElementById("swimmingAnim").addEventListener("click", function(){
+        animToggle = true;
         thetaArr = swimmingAnim;
         animFrameLen = thetaArr.length -1;
         animFrameCounter = 0;
+
     });
 
     document.getElementById("dancingAnim").addEventListener("click", function(){
+        animToggle = true;
         thetaArr = dancigAnim;
         animFrameLen = thetaArr.length -1;
         animFrameCounter = 0;
+
     });
 
     for(i=0; i<numNodes; i++) initNodes(i);
