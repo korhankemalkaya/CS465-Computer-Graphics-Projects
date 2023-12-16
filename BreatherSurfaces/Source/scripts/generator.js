@@ -23,28 +23,45 @@ var vPrecision = 0.1;
 function breather_formula(aa, u, v)
 {
     var w = Math.sqrt(1 - aa * aa);
-    var denom = aa * (Math.pow(w * Math.cosh(aa * u), 2) + Math.pow(w * Math.sin(w * v), 2));
+    var denom = aa * (Math.pow(w * Math.cosh(aa * u), 2) + Math.pow(aa * Math.sin(w * v), 2));
     //define x
     var x = -u + (2 * (1 - aa * aa) * Math.cosh(aa * u) * Math.sin(aa * u)) / denom;
     //define y
     var y = (2 * w * Math.cosh(aa * u) * (-w * Math.cos(v) * Math.cos(w * v) - Math.sin(v) * Math.sin(w * v))) / denom;
     //define z
     var z = (2 * w * Math.cosh(aa * u) * (-w * Math.sin(v) * Math.cos(w * v) + Math.cos(v) * Math.sin(w * v))) / denom;
-    /* 
+     
     //Define normals
     //Compute partial derivatives for normals
     //Compute dxdu
-    var dxdu = 
-    var dydu = 
-    var dzdu =
-    var dxdv = /* partial derivative of x with respect to v 
-    var dydv = /* partial derivative of y with respect to v 
-    var dzdv = /* partial derivative of z with respect to v 
+    var dxdu = 2 * ((1 - aa * aa) * Math.cos(aa * u) * Math.cosh(aa * u) / ((aa * aa * Math.sin(v * w) * Math.sin(v * w)) + (w * w * Math.cosh(aa * u) * Math.cosh(aa * u))))
+            -(4 * (1 - aa * aa) * w * w * Math.sin(aa * u) * Math.sinh(aa * u) * Math.cosh(aa * u) * Math.cosh(aa * u)) / 
+            ((aa * aa * Math.sin(v * w) * Math.sin(v * w) + w * w * Math.cosh(aa * u) * Math.cosh(aa * u)) * (aa * aa * Math.sin(v * w) * Math.sin(v * w) + w * w * Math.cosh(aa * u) * Math.cosh(aa * u)))
+            +(2 * (1 - aa * aa) * Math.sin(aa * u) * Math.sinh(aa * u))/(aa * aa * Math.sin(v * w) * Math.sin(v * w) + w * w * Math.cosh(aa * u) * Math.cosh(aa * u)) - 1;
+    
+    var dydu = (2*Math.sinh(aa*u)*(Math.sin(v)*Math.sin(v*w)+w*Math.cos(v)*Math.cos(v*w))*(Math.pow(w,3)*Math.pow(Math.cosh(aa*u),2)-aa*aa*w*Math.pow(Math.sin(v*w),2)))
+            /((aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2)));
+    
+    var dzdu = (2*Math.sinh(aa*u)*(w*Math.sin(v)*Math.cos(v*w)-Math.cos(v)*Math.sin(v*w))*(Math.pow(w,3)*Math.pow(Math.cosh(aa*u),2)-aa*aa*w*Math.pow(Math.sin(v*w),2)))
+            /((aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2)));
+    
+    var dxdv = (4 * aa * (aa * aa - 1) * w * Math.sin(aa * u) * Math.cosh(aa * u) * Math.sin(v * w) * Math.cos(v * w))
+            /((aa * aa * Math.sin(v * w) * Math.sin(v * w) + w * w * Math.cosh(aa * u) * Math.cosh(aa * u)) * (aa * aa * Math.sin(v * w) * Math.sin(v * w) + w * w * Math.cosh(aa * u) * Math.cosh(aa * u)));
+    
+    var dydv = ((2*w*Math.cosh(aa*u)*(w*w*Math.cos(v)*Math.sin(v*w)-Math.cos(v)*Math.sin(v*w)))
+            /(aa*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))))
+            -((4*aa*w*w*Math.cosh(aa*u)*Math.sin(v*w)*Math.cos(v*w)*(-Math.sin(v)*Math.sin(v*w)-w*Math.cos(v)*Math.cos(v*w)))
+            /((aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))));
+    
+    var dzdv = (((2*w*Math.cosh(aa*u)*(w*w*Math.sin(v)*Math.sin(v*w)-Math.sin(v)*Math.sin(v*w)))
+            /(aa*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))))
+            -((4*aa*w*w*Math.cosh(aa*u)*Math.sin(v*w)*Math.cos(v*w)*(Math.cos(v)*Math.sin(v*w)-w*Math.sin(v)*Math.cos(v*w)))
+            /((aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))*(aa*aa*Math.pow(Math.sin(v*w),2)+w*w*Math.pow(Math.cosh(aa*u),2))))); 
 
     // Compute normal using cross product
     var nx = dydu * dzdv - dzdu * dydv;
     var ny = dzdu * dxdv - dxdu * dzdv;
-    var nz = dxdu * dydv - dydu * dxdv;*/
+    var nz = dxdu * dydv - dydu * dxdv;
 
     x = (isNaN(x)) ? 0 : x;
     y = (isNaN(y)) ? 0 : y;
@@ -52,9 +69,9 @@ function breather_formula(aa, u, v)
 
 
     var points = vec4(x, y, z);
-    // var normal = vec4(nx, ny, nz);
+    var normal = vec4(nx, ny, nz);
     return {    point: points, 
-                // normal: normal
+                 normal: normal
             };
 
 }
@@ -65,9 +82,6 @@ function breather_formula(aa, u, v)
     Generates Vertices according to Breather Surface
 */  
 function generate_vertices() {
-    var vertices = [];
-    //var normals = [];
-    //var texCoords = [];
 
     var uSteps = Math.floor((uMax - uMin) / uPrecision);
     var vSteps = Math.floor((vMax - vMin) / vPrecision);
@@ -88,29 +102,29 @@ function generate_vertices() {
 
             // Triangle 1
             vertices.push(...p00.point);
-            //normals.push(...p00.normal);
-            //texCoords.push(u0, v0);
+            normals.push(...p00.normal);
+            textCoords.push(u0, v0);
 
             vertices.push(...p10.point);
-            //normals.push(...p10.normal);
-            //texCoords.push(u1, v0);
+            normals.push(...p10.normal);
+            textCoords.push(u1, v0);
 
             vertices.push(...p01.point);
-            //normals.push(...p01.normal);
-            //texCoords.push(u0, v1);
+            normals.push(...p01.normal);
+            textCoords.push(u0, v1);
 
             // Triangle 2
             vertices.push(...p10.point);
-            //normals.push(...p10.normal);
-            //texCoords.push(u1, v0);
+            normals.push(...p10.normal);
+            textCoords.push(u1, v0);
 
             vertices.push(...p11.point);
-            //normals.push(...p11.normal);
-            //texCoords.push(u1, v1);
+            normals.push(...p11.normal);
+            textCoords.push(u1, v1);
 
             vertices.push(...p01.point);
-            //normals.push(...p01.normal);
-            //texCoords.push(u0, v1);
+            normals.push(...p01.normal);
+            textCoords.push(u0, v1);
         }
     }
 }

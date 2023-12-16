@@ -29,8 +29,8 @@ function updateZoom(in_out)
 var near = -10;
 var far = 10;
 var radius = 4.0;
-var theta  = 0;
-var phi    = 0;
+var theta  = 45;
+var phi    = 45;
 var dr = 5.0 * Math.PI / 180.0;
 
 // Camera
