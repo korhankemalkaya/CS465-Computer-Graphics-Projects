@@ -167,30 +167,16 @@ function handleEvents()
         generate_breather();
     };
 
-    document.getElementById('uMin').onchange = function()
+    document.getElementById('uValue').onchange = function()
     {
-        uMin = parseFloat(this.value);
+        uValue = parseFloat(this.value);
         updateSliders();
         generate_breather();
     };
 
-    document.getElementById('uMax').onchange = function()
+    document.getElementById('vValue').onchange = function()
     {
-        uMax = parseFloat(this.value);
-        updateSliders();
-        generate_breather();
-    };
-
-    document.getElementById('vMin').onchange = function()
-    {
-        vMin = parseFloat(this.value);
-        updateSliders();
-        generate_breather();
-    };
-
-    document.getElementById('vMax').onchange = function()
-    {
-        vMax = parseFloat(this.value);
+        vValue = parseFloat(this.value);
         updateSliders();
         generate_breather();
     };
@@ -235,21 +221,21 @@ function updateSliders()
 
 
 
-    document.getElementById('uMin').value = "" + uMin;
-    document.getElementById('uMax').value = "" + uMax;
-    document.getElementById('uMin_val').innerHTML = "" + uMin;
-    document.getElementById('uMax_val').innerHTML = "" + uMax;
+    document.getElementById('uValue').value = "" + uValue;
+    document.getElementById('vValue').value = "" + vValue;
+    document.getElementById('uValue_val').innerHTML = "" + uValue;
+    document.getElementById('vValue_val').innerHTML = "" + vValue;
 
 
-    document.getElementById('vMin').value = "" + vMin;
+  /*  document.getElementById('vMin').value = "" + vMin;
     document.getElementById('vMax').value = "" + vMax;
     document.getElementById('vMin_val').innerHTML = "" + vMin;
-    document.getElementById('vMax_val').innerHTML = "" + vMax;
+    document.getElementById('vMax_val').innerHTML = "" + vMax;*/
 
 
     document.getElementById('vPrecision').value = "" + vPrecision;
     document.getElementById('uPrecision').value = "" + uPrecision;
-    document.getElementById('vPrecision_val').innerHTML = "" + vMin;
+    document.getElementById('vPrecision_val').innerHTML = "" + vPrecision;
     document.getElementById('uPrecision_val').innerHTML = "" + uPrecision;
 ;
 
@@ -374,3 +360,12 @@ function loadTextures()
         document.getElementById("texture").appendChild(option);
     }
 }
+
+//TODO List:
+// 1. Phi value fix
+// 2. İlk hali kötü gösteriyor onu düzeltcez
+// 3. Hafif yayvan
+// 4. Environment mapping yapıyoruz, onun için texture farklılaştırması
+// 5. En son kod düzeltmesi-değiştirmesi + html vsvs
+// 6. Shaderlarla alakalı bir sıkıntı var gibi
+// 7. Sina hocaya mail atıyorum yayvanlık hakkında
