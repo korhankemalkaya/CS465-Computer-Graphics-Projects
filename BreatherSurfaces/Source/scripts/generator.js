@@ -1,10 +1,11 @@
 var aa = 0.4;
-var uMin = -14;
-var uMax = 14;
-var vMin = 0;
-var vMax = 2 * Math.PI;
+var uValue = 14; //between -14 and 14
+var vValue = 1; //between 0 and 2pi
 var uPrecision = 0.1;
 var vPrecision = 0.1;
+
+
+
 //Parametric formular for breather surface
 //Parametrization of the Breather Surfaces as follows:
 //Parameter of the family is aa E [0,1]
@@ -63,9 +64,9 @@ function breather_formula(aa, u, v)
     var ny = dzdu * dxdv - dxdu * dzdv;
     var nz = dxdu * dydv - dydu * dxdv;
 
-    x = (isNaN(x)) ? 0 : x;
+   /* x = (isNaN(x)) ? 0 : x;
     y = (isNaN(y)) ? 0 : y;
-    z = (isNaN(z)) ? 0 : z;
+    z = (isNaN(z)) ? 0 : z;*/
 
 
     var points = vec4(x, y, z);
@@ -83,16 +84,15 @@ function breather_formula(aa, u, v)
 */  
 function generate_vertices() {
 
-    var uSteps = Math.floor((uMax - uMin) / uPrecision);
-    var vSteps = Math.floor((vMax - vMin) / vPrecision);
-
+    var uSteps = Math.floor( 2*(uValue) / uPrecision);
+    var vSteps = Math.floor(  (vValue * Math.PI) / vPrecision); 
     for (var i = 0; i < uSteps; i++) {
         for (var j = 0; j < vSteps; j++) {
             // Four vertices of the current quad
-            var u0 = uMin + i * uPrecision;
-            var v0 = vMin + j * vPrecision;
-            var u1 = uMin + (i + 1) * uPrecision;
-            var v1 = vMin + (j + 1) * vPrecision;
+            var u0 = -uValue + i * uPrecision; 
+            var v0 =  j * vPrecision;
+            var u1 = -uValue + (i + 1) * uPrecision;
+            var v1 =  (j + 1) * vPrecision;
 
             // Retrieve the points and normals for each vertex of the quad
             var p00 = breather_formula(aa, u0, v0);
