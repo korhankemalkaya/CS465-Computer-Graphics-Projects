@@ -5,6 +5,22 @@ var canvas, gl, program;
 var modelViewMatrix, projectionMatrix, normalMatrix;
 var modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
 
+var cameraMatrixY = [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1
+];
+var cameraMatrixLocY;
+
+var cameraMatrixX = [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1
+];
+var cameraMatrixLocX;
+
 // Buffers
 
 var vBuffer, nBuffer, tBuffer;
@@ -21,6 +37,33 @@ var textCoords = [];
 var texture, t_ind = 0;
 var tex_url = img_urls[t_ind];
 var cubeMap;
+
+
+//Camera rotate around y axis
+function cameraRotateY(angleVar){
+    var cosVar = Math.cos(angleVar);
+    var sinVar = Math.sin(angleVar);
+
+    cameraMatrixY[0] = cosVar;
+    cameraMatrixY[2] = -sinVar;
+    cameraMatrixY[8] = sinVar;
+    cameraMatrixY[10] = cosVar;
+}
+
+//Camera rotate around x axis
+function cameraRotateX(angleVar){
+    var cosVar = Math.cos(angleVar);
+    var sinVar = Math.sin(angleVar);
+
+    cameraMatrixX[5] = cosVar;
+    cameraMatrixX[6] = sinVar;
+    cameraMatrixX[9] = -sinVar;
+    cameraMatrixX[10] = cosVar;
+}
+
+function degreeToRadians(degreeVar){
+    return degreeVar * Math.PI / 180;
+}
 
 // Onload
 window.onload = function init()
@@ -99,9 +142,7 @@ function render()
 {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    eye = vec3(radius * Math.sin(theta) * Math.cos(phi), radius * Math.sin(phi), radius * Math.cos(theta));
-
-    modelViewMatrix = lookAt(eye, at, up);
+    modelViewMatrix = mat4();
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
     normalMatrix = [
         vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
@@ -112,6 +153,8 @@ function render()
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
+    gl.uniformMatrix4fv( cameraMatrixLocY, false, flatten(cameraMatrixY));
+    gl.uniformMatrix4fv( cameraMatrixLocX, false, flatten(cameraMatrixX));
 
     // Draw
     for(var j = 0; j < vertices.length; j += 3)
@@ -192,12 +235,16 @@ function handleEvents()
         updateSliders();
         generate_breather();
     };
+    document.getElementById("rotateY").onchange = function() {
+        radianDeg = degreeToRadians(event.srcElement.value);
+        cameraRotateY(radianDeg);
+    };
+    document.getElementById("rotateX").onchange = function() {
+        radianDeg = degreeToRadians(event.srcElement.value);
+        cameraRotateX(radianDeg);
+    };
 
     // Buttons
-    document.getElementById("theta+").onclick = function(){ theta += dr; };
-    document.getElementById("theta-").onclick = function(){ theta -= dr; };
-    document.getElementById("phi+").onclick = function(){ phi += dr; };
-    document.getElementById("phi-").onclick = function(){ phi -= dr; };
     document.getElementById("zoom-in").onclick = function(){ updateZoom('+'); };
     document.getElementById("zoom-out").onclick = function(){ updateZoom('-'); };
 
@@ -264,6 +311,8 @@ function updateProgram()
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
     normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
+    cameraMatrixLocY = gl.getUniformLocation( program, "cameraMatrixY" );
+    cameraMatrixLocX = gl.getUniformLocation( program, "cameraMatrixX" );
 
     handleEvents();
 
