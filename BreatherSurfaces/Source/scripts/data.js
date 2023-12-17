@@ -29,7 +29,7 @@ var near = -10;
 var far = 10;
 var radius = 4.0;
 
-var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightPosition = vec4(0.0, 5.0, 5.0, 0.0 );
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
@@ -49,19 +49,23 @@ var materialShininess = 20.0;
 var texSize = 64;
 
 var temp = new Array();
-for(var i = 0; i < texSize; i++)
+for (var i = 0; i < texSize; i++)
     temp[i] = new Array();
 
-for(var i = 0; i < texSize; i++)
-    for(var j = 0; j < texSize; j++)
-       temp[i][j] = new Float32Array(4);
+for (var i = 0; i < texSize; i++)
+    for (var j = 0; j < texSize; j++)
+        temp[i][j] = new Float32Array(4);
 
-for(var i = 0; i < texSize; i++)
-{
-    for(var j = 0; j < texSize; j++)
-    {
-        var c = (((i & 0x8) == 0) ^ ((j & 0x8)  == 0));
-        temp[i][j] = [c, c, c, 1];
+for (var i = 0; i < texSize; i++) {
+    for (var j = 0; j < texSize; j++) {
+        var isRed = (((i & 0x8) == 0) ^ ((j & 0x8) == 0));
+        if (isRed) {
+            // Red color
+            temp[i][j] = [1, 0, 0, 1]; // Red with full opacity
+        } else {
+            // White color
+            temp[i][j] = [1, 1, 1, 1]; // White with full opacity
+        }
     }
 }
 
