@@ -74,7 +74,6 @@ function breather_formula(aa, u, v)
     return {    point: points, 
                  normal: normal
             };
-
 }
     
 

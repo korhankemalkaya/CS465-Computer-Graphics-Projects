@@ -26,7 +26,6 @@ var cubeMap;
 window.onload = function init()
 {
     loadTextures();
-    document.body.style.zoom = "90%";   // Setting zoom
 
     // Canvas
     canvas = document.getElementById("gl-canvas");
@@ -100,7 +99,7 @@ function render()
 {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    eye = vec3(radius * Math.sin(theta) * Math.cos(phi), radius * Math.sin(theta) * Math.sin(phi), radius * Math.cos(theta));
+    eye = vec3(radius * Math.sin(theta) * Math.cos(phi), radius * Math.sin(phi), radius * Math.cos(theta));
 
     modelViewMatrix = lookAt(eye, at, up);
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
