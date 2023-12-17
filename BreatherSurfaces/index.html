@@ -38,12 +38,7 @@
                     </select>
 
                     <hr>
-
-                    <hr>
-
-                    <label for="texture">Choose Texture: </label>
-                    <select name="" id="texture" class="form-control"></select>
-                    <br>
+                    
                     <div class="row">
                         <div class="col-sm-10">
                             <label for="env-active">Environment mapping: </label>
@@ -206,13 +201,9 @@
     precision mediump float;
 
     varying vec4 fColor;
-    varying vec2 fTexCoord;
-
-    uniform sampler2D texture;
-
     void main()
     {
-        gl_FragColor = fColor * texture2D(texture, fTexCoord);
+        gl_FragColor = fColor;
     }
 
     </script>
@@ -284,9 +275,6 @@
     uniform float shininess;
     varying vec3 N, L, E, R;
 
-    varying vec2 fTexCoord;
-    uniform sampler2D texture;
-
     void main()
     {
         vec4 fColor;
@@ -306,7 +294,7 @@
         fColor = ambient + diffuse +specular;
         fColor.a = 1.0;
 
-        gl_FragColor = fColor * texture2D(texture, fTexCoord);
+        gl_FragColor = fColor;
     }
     </script>
 

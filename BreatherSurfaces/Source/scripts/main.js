@@ -34,8 +34,8 @@ var normals = [];
 var textCoords = [];
 
 // Texture / Environment mapping
-var texture, t_ind = 0;
-var tex_url = img_urls[t_ind];
+//var texture, t_ind = 0;
+//var tex_url = img_urls[t_ind];
 var cubeMap;
 
 
@@ -68,7 +68,7 @@ function degreeToRadians(degreeVar){
 // Onload
 window.onload = function init()
 {
-    loadTextures();
+    //loadTextures();
 
     // Canvas
     canvas = document.getElementById("gl-canvas");
@@ -121,11 +121,11 @@ function generate_breather()
         gl.uniform1i(gl.getUniformLocation(program, "texMap"), 0);
 
         // Texture map
-        configureTexture();
+        /*configureTexture();
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+        gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);*/
     }
 
     vBuffer = gl.createBuffer();
@@ -185,12 +185,12 @@ function handleEvents()
     document.getElementById('env-active').addEventListener("change", function()
     {
         env_map = this.checked;
-        document.getElementById("texture").disabled = env_map;
+        //document.getElementById("texture").disabled = env_map;
         updateProgram();
     });
 
     // Texture
-    document.getElementById('texture').addEventListener("change", function()
+    /*document.getElementById('texture').addEventListener("change", function()
     {
         options = document.getElementById("texture");
 
@@ -199,7 +199,7 @@ function handleEvents()
 
         updateSliders();
         generate_breather();
-    });
+    });*/
 
     // Slider
     document.getElementById('aa').onchange = function()
@@ -259,7 +259,7 @@ function updateSliders()
 
 
     document.getElementById('env-active').disabled = (shading === 0);
-    document.getElementById("texture").disabled = (shading === 0);
+    //document.getElementById("texture").disabled = (shading === 0);
 
     document.getElementById('aa').value = "" + aa;
     document.getElementById('aa').value = "" + aa;
@@ -286,7 +286,7 @@ function updateSliders()
 ;
 
     document.getElementById("shading-type").value = shading;
-    document.getElementById("texture").value = t_ind + 1;
+    //document.getElementById("texture").value = t_ind + 1;
 }
 
 // Update program
@@ -333,7 +333,7 @@ function updateProgram()
     https://webglfundamentals.org/webgl/lessons/webgl-cors-permission.html
 
 */
-function configureTexture()
+/*function configureTexture()
 {
     texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -363,7 +363,7 @@ function configureTexture()
 
     requestCORSIfNotSameOrigin(img, tex_url);
     img.src = tex_url;
-}
+}*/
 
 /**
     Obtained from Lecture codes
@@ -389,15 +389,15 @@ function configureCubeMap() {
 
     https://webglfundamentals.org/webgl/lessons/webgl-cors-permission.html
 */
-function requestCORSIfNotSameOrigin(img, tex_url)
+/*function requestCORSIfNotSameOrigin(img, tex_url)
 {
     if ((new URL(tex_url)).origin !== window.location.origin)
     {
         img.crossOrigin = "";
     }
-}
+}*/
 
-function loadTextures()
+/*function loadTextures()
 {
     document.getElementById("texture").innerHTML = "";
     for(var i = 0; i < img_urls.length; i++)
@@ -407,7 +407,7 @@ function loadTextures()
         option.innerHTML = "" + (i + 1);
         document.getElementById("texture").appendChild(option);
     }
-}
+}*/
 
 //TODO List:
 // 1. Phi value fix

@@ -39,11 +39,11 @@ var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
 var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialShininess = 20.0;
 
-var img_urls = ["https://i.imgur.com/bEZZfeY.jpg",
+/*var img_urls = ["https://i.imgur.com/bEZZfeY.jpg",
                 "https://i.imgur.com/J7QV7qd.jpg",
                 "https://i.imgur.com/EsRbwr7.jpg",
                 "https://i.imgur.com/sy6DqE7.jpg",
-                "https://i.imgur.com/wg3op6k.jpg"];
+                "https://i.imgur.com/wg3op6k.jpg"];*/
 
 // Environment Mapping (checker board pattern on outside cube)
 var texSize = 64;
