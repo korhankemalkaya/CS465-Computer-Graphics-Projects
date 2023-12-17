@@ -1,5 +1,5 @@
 //
-var zoom = 2;
+var zoom = 10;
 const zoomVal = 0.5;
 const zoomMax = 20;
 const zoomMin = 1;
