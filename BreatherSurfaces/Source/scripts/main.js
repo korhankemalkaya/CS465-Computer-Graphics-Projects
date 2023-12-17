@@ -368,6 +368,10 @@ function updateProgram()
 /**
     Obtained from Lecture codes
 */
+//For pattern, rather than use a texture image not checkerboard pattern
+//First use image metalic background texture and make it pattern
+//Then use it as texture
+
 function configureCubeMap() {
 
     cubeMap = gl.createTexture();
@@ -383,6 +387,7 @@ function configureCubeMap() {
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
+
 
 /**
     Reference:
@@ -410,10 +415,8 @@ function configureCubeMap() {
 }*/
 
 //TODO List:
-// 1. Phi value fix
-// 2. İlk hali kötü gösteriyor onu düzeltcez
-// 3. Hafif yayvan
-// 4. Environment mapping yapıyoruz, onun için texture farklılaştırması
-// 5. En son kod düzeltmesi-değiştirmesi + html vsvs
-// 6. Shaderlarla alakalı bir sıkıntı var gibi
-// 7. Sina hocaya mail atıyorum yayvanlık hakkında
+// 1. Shadingle beraber kamera bozuluyor
+// 2. Yukarı aşağı oynamıyor ucu phi ile , dikeyde dönmüyor yani
+// 3. En son kod düzeltmesi-değiştirmesi + html vsvs
+// 4. UI düzenleme
+// 5. Ufak tefek sorunlar var, ama Allahın izniyle düzelteceğiz. aslanım benim :D 
