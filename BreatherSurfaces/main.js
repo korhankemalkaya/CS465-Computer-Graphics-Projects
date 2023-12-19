@@ -419,8 +419,3 @@ function configureCubeMap(){
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
-
-//TODO List:
-// 3. En son kod düzeltmesi-değiştirmesi + html vsvs
-// 4. UI düzenleme
-// 5. Ufak tefek sorunlar var, ama Allahın izniyle düzelteceğiz. aslanım benim :D 

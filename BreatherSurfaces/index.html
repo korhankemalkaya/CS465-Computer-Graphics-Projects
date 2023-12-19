@@ -3,75 +3,85 @@
 <head>
     <meta charset="utf-8">
     <title>Breather Surfaces</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color:  #5b065c;;
+            color: white;
+        }
+        #bgCanvas {
+            padding: 20px;
+        }
+        .custom-range {
+            background-color: white;
+        }
+        canvas {
+            width: auto; /* Make canvas responsive */
+            height: auto;
+        }
+    </style>
 </head>
-<body style="background-color:rgb(37, 23, 192);">
-    <div>
-        <div>
-            <div>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Parameters</h2>
+                <button class="btn btn-primary my-2" id="zoom-in">Zoom in</button>
+                <button class="btn btn-secondary my-2" id="zoom-out">Zoom out</button>
+
+                <hr>
+                <label for="shading-type">Choose Shader: </label>
+                <select class="custom-select" id="shading-type">
+                    <option value="0">Wireframe</option>
+                    <option value="1">Phong</option>
+                    <option value="2">Gouraud</option>
+                </select>
+                <hr>
+
+                <label for="env-active">Environment mapping: </label>
+                <input type="checkbox" id="env-active">
+
+                <hr>
+                <!-- Applying Bootstrap's custom-range class to all sliders -->
                 <div>
-                    <h2 style="margin: 0; color: white;">Parameters</h2>
+                    <label for="aa">aa: <span id="aa_val"></span></label>
+                    <input type="range" class="custom-range" min="0.01" step="0.01" max="0.99" value="0.5" id="aa">
                 </div>
                 <div>
-                    <button id="zoom-in">Zoom in</button>
-                    <button id="zoom-out">Zoom out</button>
+                    <label for="uValue">uValue: <span id="uValue_val"></span></label>
+                    <input type="range" class="custom-range" min="1" step="1" max="50" value="14" id="uValue">
+                </div>
+                <div>
+                    <label for="vValue">vValue: <span id="vValue_val"></span></label>
+                    <input type="range" class="custom-range" min="0.1" step="0.1" max="20.0" value="1.0" id="vValue">
+                </div>
+                <div>
+                    <label for="uPrecision">uPrecision: <span id="uPrecision_val"></span></label>
+                    <input type="range" class="custom-range" min="0.01" step="0.1" max="1.0" value="0.1" id="uPrecision">
+                </div>
+                <div>
+                    <label for="vPrecision">vPrecision: <span id="vPrecision_val"></span></label>
+                    <input type="range" class="custom-range" min="0.01" step="0.1" max="1.0" value="0.1" id="vPrecision">
+                </div>
+                <div>
+                    <label for="rotateY">Rotate Camera Y</label>
+                    <input type="range" class="custom-range" id="rotateY" min="-180" max="180" step="10" value="0">
+                </div>
+                <div>
+                    <label for="rotateX">Rotate Camera X</label>
+                    <input type="range" class="custom-range" id="rotateX" min="-180" max="180" step="10" value="0">
+                </div>
+                <hr>
+            </div>
+            <div class="col-md-8">
+                <div id="bgCanvas">
+                        <canvas id="gl-canvas" width="1000" height="1000"> 
+                            Your browser does not support the HTML5 canvas element.
+                        </canvas>
+                    </canvas>
                 </div>
             </div>
-
-            <hr>
-            <label style="color: rgb(255, 255, 255);" for="shading-type">Choose Shader: </label>
-            <select name="" id="shading-type">
-                <option value="0">Wireframe</option>
-                <option value="1">Phong</option>
-                <option value="2">Gouraud</option>
-            </select>
-            <hr>    
-            <div>
-                 <div>
-                    <label style="color: rgb(255, 255, 255);" for="env-active">Environment mapping: </label>
-                </div>
-                <div>
-                    <input type="checkbox" id="env-active">
-                </div>
-            </div>
-
-            <hr>
-            <div>
-                <div>
-                    <label style="color: rgb(255, 255, 255);" for="aa">aa: <span id="aa_val"></span></label>
-                    <input type="range" min="0.01" step="0.01" max="0.99" value="0.5" id="aa">
-                </div>
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="uValue">uValue: <span id="uValue_val"></span></label>
-                    <input type="range" min="1" step="1" max="50" value="14" id="uValue">
-                </div>
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="vValue">vValue: <span id="vValue_val"></span></label>
-                    <input type="range" min="0.1" step="0.1" max="20.0" value="1.0" id="vValue">
-                </div>
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="uPrecision">uPrecision: <span id="uPrecision_val"></span></label>
-                    <input type="range" min="0.01" step="0.1" max="1.0" value="0.1" id="uPrecision">
-                </div> 
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="vPrecision">vPrecision: <span id="vPrecision_val"></span></label>
-                    <input type="range" min="0.01" step="0.1" max="1.0" value="0.1" id="vPrecision">
-                </div>
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="rotateCameraYSlider">Rotate Camera Y</label>
-                    <input type="range" id="rotateY" min="-180" max="180" step="10" value="0">
-                </div>
-                <div class="mb-3">
-                    <label style="color: rgb(255, 255, 255);" for="rotateCameraXSlider">Rotate Camera X</label>
-                    <input type="range" id="rotateX" min="-180" max="180" step="10" value="0">
-                </div>
-            </div>
-            <hr>
-        </div>
-
-        <div id="bgCanvas">
-            <canvas id="gl-canvas" width="1000" height="1000">
-                Your browser does not support the HTML5 canvas element.
-            </canvas>
         </div>
     </div>
 
@@ -302,6 +312,9 @@
         gl_FragColor = fColor * texColor;
     }
     </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script type="text/javascript" src="Common/webgl-utils.js"></script>
     <script type="text/javascript" src="Common/initShaders.js"></script>
