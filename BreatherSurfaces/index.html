@@ -3,108 +3,77 @@
 <head>
     <meta charset="utf-8">
     <title>Breather Surfaces</title>
-
-    <link rel="stylesheet" href="Source/style/bootstrap/css/style.css">
-    <link rel="stylesheet" href="Source/style/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="Source/style/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="Source/style/bootstrap/css/toastr.css">
 </head>
-<body>
-    <div class="wrapper">
-        <!-- Main content -->
-        <div class="row">
-            <!-- Control panel -->
-            <div class="col-md-4">
-                <div class="control-panel">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h2 style="margin: 0; color: white;">Parameters</h2>
-                        </div>
-
-                        <div class="col-md-6 text-right">
-                            <button id="zoom-in" style="border: none; background-color: transparent;"><i class="fa fa-search-plus" style="font-size: 20px; color: white;"></i></button>
-                            <button id="zoom-out" style="border: none; background-color: transparent;"><i class="fa fa-search-minus" style="font-size: 20px; color: white;"></i></button>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <label for="shading-type">Choose Shader: </label>
-                    <select name="" id="shading-type" class="form-control">
-                        <option value="0">Wireframe</option>
-                        <option value="1">Phong</option>
-                        <option value="2">Gouraud</option>
-                    </select>
-
-                    <hr>
-                    
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <label for="env-active">Parametric surface mapping: </label>
-                        </div>
-                        <div class="col-sm-2">
-                            <input type="checkbox" id="env-active" class="form-control">
-                        </div>
-                    </div>
-
-                    <hr>
-                        <div class="mb-3">
-                            <label for="aa">aa: <span id="aa_val"></span></label>
-                            <input type="range" class="form-range" min="0.01" step="0.01" max="0.99" value="0.5" id="aa">
-                        </div>
-                        <div class="mb-3">
-                            <label for="uValue">uValue: <span id="uValue_val"></span></label>
-                            <input type="range" class="form-range" min="1" step="1" max="50" value="14" id="uValue">
-                        </div>
-                        <div class="mb-3">
-                            <label for="vValue">vValue: <span id="vValue_val"></span></label>
-                            <input type="range" class="form-range" min="0.1" step="0.1" max="20.0" value="1.0" id="vValue">
-                        </div>
-                        <div class="mb-3">
-                            <label for="uPrecision">uPrecision: <span id="uPrecision_val"></span></label>
-                            <input type="range" class="form-range" min="0.01" step="0.1" max="1.0" value="0.1" id="uPrecision">
-                        </div> 
-                        <div class="mb-3">
-                            <label for="vPrecision">vPrecision: <span id="vPrecision_val"></span></label>
-                            <input type="range" class="form-range" min="0.01" step="0.1" max="1.0" value="0.1" id="vPrecision">
-                        </div>
-                        <div class="mb-3">
-                            <label for="rotateCameraYSlider">Rotate Camera Y</label>
-                            <input type="range" class="form-range" id="rotateY" min="-180" max="180" step="10" value="0">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="rotateCameraXSlider">Rotate Camera X</label>
-                            <input type="range" class="form-range" id="rotateX" min="-180" max="180" step="10" value="0">
-                        </div>
-                       
-
-                    <hr>
-
+<body style="background-color:rgb(37, 23, 192);">
+    <div>
+        <div>
+            <div>
+                <div>
+                    <h2 style="margin: 0; color: white;">Parameters</h2>
+                </div>
+                <div>
+                    <button id="zoom-in">Zoom in</button>
+                    <button id="zoom-out">Zoom out</button>
                 </div>
             </div>
 
-            <!-- Canvas  -->
-            <div class="col-md-8 text-center">
-                <div id="bgCanvas">
-                    <div class="row text-center">
-                        <div class="col-md-12">
-                            <canvas id="gl-canvas" width="1000" height="1000">
-                                Your browser does not support the HTML5 canvas element.
-                            </canvas>
-                        </div>
-                    </div>
+            <hr>
+            <label style="color: rgb(255, 255, 255);" for="shading-type">Choose Shader: </label>
+            <select name="" id="shading-type">
+                <option value="0">Wireframe</option>
+                <option value="1">Phong</option>
+                <option value="2">Gouraud</option>
+            </select>
+            <hr>    
+            <div>
+                 <div>
+                    <label style="color: rgb(255, 255, 255);" for="env-active">Environment mapping: </label>
+                </div>
+                <div>
+                    <input type="checkbox" id="env-active">
                 </div>
             </div>
-            <!-- End Canvas -->
+
+            <hr>
+            <div>
+                <div>
+                    <label style="color: rgb(255, 255, 255);" for="aa">aa: <span id="aa_val"></span></label>
+                    <input type="range" min="0.01" step="0.01" max="0.99" value="0.5" id="aa">
+                </div>
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="uValue">uValue: <span id="uValue_val"></span></label>
+                    <input type="range" min="1" step="1" max="50" value="14" id="uValue">
+                </div>
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="vValue">vValue: <span id="vValue_val"></span></label>
+                    <input type="range" min="0.1" step="0.1" max="20.0" value="1.0" id="vValue">
+                </div>
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="uPrecision">uPrecision: <span id="uPrecision_val"></span></label>
+                    <input type="range" min="0.01" step="0.1" max="1.0" value="0.1" id="uPrecision">
+                </div> 
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="vPrecision">vPrecision: <span id="vPrecision_val"></span></label>
+                    <input type="range" min="0.01" step="0.1" max="1.0" value="0.1" id="vPrecision">
+                </div>
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="rotateCameraYSlider">Rotate Camera Y</label>
+                    <input type="range" id="rotateY" min="-180" max="180" step="10" value="0">
+                </div>
+                <div class="mb-3">
+                    <label style="color: rgb(255, 255, 255);" for="rotateCameraXSlider">Rotate Camera X</label>
+                    <input type="range" id="rotateX" min="-180" max="180" step="10" value="0">
+                </div>
+            </div>
+            <hr>
         </div>
 
+        <div id="bgCanvas">
+            <canvas id="gl-canvas" width="1000" height="1000">
+                Your browser does not support the HTML5 canvas element.
+            </canvas>
+        </div>
     </div>
-
-    <!-- ________Scripts_______ -->
-
-    <!-- SHADERS -->
 
     <!-- Wirefirame Vertex Shader -->
     <script type="x-shader/x-vertex" id="wire-frame-vertex-shader">
@@ -115,10 +84,11 @@
     uniform mat4 projectionMatrix;
     uniform mat4 cameraMatrixY;
     uniform mat4 cameraMatrixX;
+    uniform mat4 zoomMatrix;
 
     void main()
     {
-        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixY * cameraMatrixX;
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixY * cameraMatrixX * zoomMatrix;
     }
 
     </script>
@@ -135,8 +105,6 @@
     }
 
     </script>
-
-    <!-- =================================================================== -->
 
     <!-- Phong Vertex Shader -->
     <script type="x-shader/x-vertex" id="phong-vertex-shader">
@@ -158,6 +126,7 @@
     uniform mat3 normalMatrix;
     uniform mat4 cameraMatrixY;
     uniform mat4 cameraMatrixX;
+    uniform mat4 zoomMatrix;
 
     void main()
     {
@@ -186,7 +155,7 @@
             specular = vec4(0.0, 0.0, 0.0, 1.0);
         }
 
-        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixX * cameraMatrixY;
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixY * cameraMatrixX * zoomMatrix;
         fColor = ambient + diffuse + specular;
         fColor.a = 1.0;
 
@@ -208,7 +177,7 @@
 
     </script>
 
-    <!-- Phong Fragment Shader (Environment mapping technique) -->
+    <!-- Phong Fragment Shader env map-->
     <script type="x-shader/x-fragment" id="phong-fragment-shader-env">
 
     precision mediump float;
@@ -226,8 +195,6 @@
 
     </script>
 
-    <!-- =================================================================== -->
-
     <!-- Gouraud Vertex Shader -->
     <script type="x-shader/x-vertex" id="gouraud-vertex-shader">
 
@@ -244,6 +211,7 @@
     uniform mat3 normalMatrix;
     uniform mat4 cameraMatrixY;
     uniform mat4 cameraMatrixX;
+    uniform mat4 zoomMatrix;
 
     void main()
     {
@@ -258,7 +226,7 @@
         N = normalize( normalMatrix*vNormal.xyz);
         R = reflect(pos, N);
 
-        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixX * cameraMatrixY;
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition * cameraMatrixY * cameraMatrixX * zoomMatrix;
         fTexCoord = vTexCoord;
     }
 
@@ -298,7 +266,7 @@
     }
     </script>
 
-    <!-- Gouraud Fragment shading (Environment mapping)-->
+    <!-- Gouraud Fragment shading env map-->
     <script type="x-shader/x-fragment" id="gouraud-fragment-shader-env">
 
     precision mediump float;
@@ -335,18 +303,9 @@
     }
     </script>
 
-    <!-- Included sciprts for src and Executable -->
     <script type="text/javascript" src="Common/webgl-utils.js"></script>
     <script type="text/javascript" src="Common/initShaders.js"></script>
     <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="Source/scripts/data.js"></script>
-    <script type="text/javascript" src="Source/scripts/generator.js"></script>
-    <script type="text/javascript" src="Source/scripts/main.js"></script>
-
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="Source/style/bootstrap/js/fullView.js"></script>
-    <script src="Source/style/bootstrap/js/toastr.js"></script>
-
+    <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
